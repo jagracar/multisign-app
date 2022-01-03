@@ -145,7 +145,7 @@ export class MultisignContextProvider extends React.Component {
             createRemoveUserProposal: async (userAddress) => {
                 // Set the multisign contract if it's undefined
                 if (this.state.contract === undefined) {
-                    await this.state.setContract();
+                	await this.state.setContract();
 
                     // Return if the contract is still undefined
                     if (this.state.contract === undefined) return;
@@ -158,7 +158,45 @@ export class MultisignContextProvider extends React.Component {
 
                 // Wait for the confirmation
                 await this.confirmOperation(operation);
-            }
+            },
+
+            // Creates a minimum votes proposal
+            createMinimumVotesProposal: async (minimumVotes) => {
+                // Set the multisign contract if it's undefined
+                if (this.state.contract === undefined) {
+                	await this.state.setContract();
+
+                    // Return if the contract is still undefined
+                    if (this.state.contract === undefined) return;
+                }
+
+                // Send the minimum votes proposal operation
+                console.log(`Sending the minimum votes proposal operation...`);
+                const operation = await this.state.contract.methods.minimum_votes_proposal(minimumVotes).send()
+                    .catch((error) => console.log('Error while sending the minimum votes proposal operation:', error));
+
+                // Wait for the confirmation
+                await this.confirmOperation(operation);
+            },
+
+            // Creates an expiration time proposal
+            createExpirationTimeProposal: async (expirationTime) => {
+                // Set the multisign contract if it's undefined
+                if (this.state.contract === undefined) {
+                	await this.state.setContract();
+
+                    // Return if the contract is still undefined
+                    if (this.state.contract === undefined) return;
+                }
+
+                // Send the expiration time proposal operation
+                console.log(`Sending the expiration time proposal operation...`);
+                const operation = await this.state.contract.methods.expiration_time_proposal(expirationTime).send()
+                    .catch((error) => console.log('Error while sending the expiration time proposal operation:', error));
+
+                // Wait for the confirmation
+                await this.confirmOperation(operation);
+            },
         };
     }
 
