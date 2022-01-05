@@ -1,0 +1,17 @@
+// Media queries breakpoint variables
+$S:  480px; // 30em for 16px body font
+$M:  816px; // 51em for 16px body font
+$L: 1440px; // 90em for 16px body font
+
+// Color variables
+$general-text-color: lighten(black, 20%);
+$header-color: lighten(black, 40%);
+$link-color: lighten(blue, 20%);
+$section-background-color: darken(white, 2%);
+$button-background-color: darken(white, 6%);
+$is-user-background-color: lighten(green, 60%);
+$button-hover-background-color: darken(white, 10%);
+$is-user-hover-background-color: lighten(green, 50%);
+$border-color: darken(white, 30%);
+$yes-vote-background-color: lighten(green, 60%);
+$no-vote-background-color: lighten(red, 30%);

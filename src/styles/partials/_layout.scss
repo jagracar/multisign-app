@@ -1,0 +1,68 @@
+/*
+ * General layout
+ */
+
+html, body {
+    height: 100%;
+}
+
+// 1st flexbox group
+.app-container {
+    display: flex;
+    flex-direction: column;
+}
+
+// 2nd flexbox group
+.header-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+// 3rd flexbox group
+.sync-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: baseline;
+    column-gap: 1em;
+}
+
+// 4th flexbox group
+.users-list {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5em;
+}
+
+// 5th flexbox group
+.proposal {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: baseline;
+}
+
+.proposal-timestamp {
+    flex: 0 0 auto;
+}
+
+.proposal-description {
+    flex: 1 1 auto;
+    overflow: hidden;
+}
+
+.proposal-extra-information {
+    flex: 0 0 auto;
+}
+
+// 6th flexbox group
+.proposal-extra-information {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    gap: 0.5em;
+}

@@ -1,20 +1,23 @@
 import React from 'react';
 import { MultisignContextProvider } from './context';
 import { Header } from './header';
-import { Users } from './users';
+import { Parameters } from './parameters';
 import { Proposals } from './proposals';
+import { ProposalForms } from './forms';
 import { Footer } from './footer';
-import './App.css';
 
 
 export default function App() {
 
     return (
-        <div className="App">
+        <div className='app-container'>
             <MultisignContextProvider>
-                <Header />
-                <Users />
-                <Proposals />
+                <div className='content-container'>
+                    <Header />
+                    <Parameters />
+                    <Proposals />
+                    <ProposalForms />
+                </div>
                 <Footer />
             </MultisignContextProvider>
         </div>

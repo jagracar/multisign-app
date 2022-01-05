@@ -1,0 +1,178 @@
+/*
+ * General styling
+ */
+
+*, *:before, *:after {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'HelveticaNeue-Light', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 1em;
+    line-height: 1.4;
+    color: $general-text-color;
+}
+
+a {
+    text-decoration: none;
+    color: $link-color;
+
+    &:hover, &:focus {
+        text-decoration: underline;
+    }
+
+    h1 &, h2 &, h3 &, h4 &, h5 &, h6 & {
+        color: inherit;
+
+        &:hover, &:focus {
+            text-decoration: none;
+        }
+    }
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: normal;
+    color: $header-color;
+}
+
+h2 {
+    font-size: 1.5em;
+}
+
+h3 {
+    font-size: 1.2em;
+}
+
+h4 {
+    font-size: 1.1em;
+}
+
+.content-container {
+    margin: 1em 1em 0em 1em ;
+}
+
+.tezos-address {
+    font-family: monospace;
+    font-size: 1.1em;
+    line-height: 1.1em;
+}
+
+button, input, .proposal-votes {
+    font-family: monospace;
+    font-size: 1.1em;
+    line-height: 1.1em;
+    padding: 0.5em;
+    color: $general-text-color;
+    border: 1px solid $border-color;
+    border-radius: 4px;
+    min-width: 3em;
+}
+
+button, input[type=submit] {
+    cursor: pointer;
+    background-color: $button-background-color;
+
+    &:hover {
+        background-color: $button-hover-background-color;
+    }    
+}
+
+li {
+    list-style-type: none;
+}
+
+ul {
+    margin: 1em 2em;
+    padding: 0;
+}
+
+.parameters-list > li {
+    margin-bottom: 0.8em;
+}
+
+.users-list li a {
+    display: inline-block;
+    width: 100%;
+    padding: 0.5em;
+    background-color: $button-background-color;
+    border: 1px solid $border-color;
+    border-radius: 4px;
+
+    &.is-user {
+        background-color: $is-user-background-color;
+    }
+
+    &:hover {
+        background-color: $button-hover-background-color;
+        text-decoration: none;
+        
+        &.is-user {
+            background-color: $is-user-hover-background-color;
+        }
+    }
+}
+
+.proposal-list:not(:last-child) {
+    margin-bottom: 3em;
+}
+
+.proposal {
+    padding: 0.1em 0;
+    border-bottom: 1px solid $border-color;
+
+    &:last-child {
+        border-bottom-style: none;
+    }
+}
+
+.proposal-timestamp {
+    padding: 0.5em 0em;
+    padding-right: 1em;
+}
+
+.proposal-description {
+    padding: 0.5em 1em;
+    border-left: 1px solid $border-color;
+}
+
+.proposal-extra-information {
+    padding: 0.5em 0em;
+}
+
+.proposal-votes {
+    text-align: center;
+    background-color: white;
+}
+
+.yes-vote {
+    background-color: $yes-vote-background-color;
+}
+
+.no-vote {
+    background-color: $no-vote-background-color;
+}
+
+input {
+    margin-left: 0.5em;
+}
+
+fieldset {
+    margin-bottom: 2em;
+    padding: 2em;
+    border: 1px solid $border-color;
+    border-radius: 4px;
+}
+
+section {
+    margin-bottom: 1em;
+    padding : 1em;
+    background-color: $section-background-color;
+    border: 1px solid $border-color;
+    border-radius: 10px;
+}
+
+footer {
+    border-top: 1px solid $border-color;
+    background-color: $section-background-color;
+    padding: 0 1em 0em 1em;
+}
