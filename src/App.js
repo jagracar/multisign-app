@@ -3,7 +3,7 @@ import { MultisignContextProvider } from './context';
 import { Header } from './header';
 import { Parameters } from './parameters';
 import { Proposals } from './proposals';
-import { ProposalForms } from './forms';
+import { CreateProposalForms } from './forms';
 import { Footer } from './footer';
 
 
@@ -16,7 +16,7 @@ export default function App() {
                     <Header />
                     <Parameters />
                     <Proposals />
-                    <ProposalForms />
+                    <CreateProposalForms />
                 </div>
                 <Footer />
             </MultisignContextProvider>

@@ -66,3 +66,10 @@ html, body {
     justify-content: flex-end;
     gap: 0.5em;
 }
+
+// 7th flexbox group
+.message-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

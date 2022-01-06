@@ -1,34 +1,44 @@
 import React, { useContext, useState } from 'react';
 import { MultisignContext } from '../context';
+import { ErrorMessage } from '../messages';
 
 
-export function ProposalForms(props) {
+export function CreateProposalForms(props) {
     // Get the multisign context
     const context = useContext(MultisignContext);
 
     // Return if the user is not connected or is not one of the multisign users
     if (!(context.activeAccount && context.storage?.users.includes(context.activeAccount.address))) {
-        return <></>;
+        return null;
     }
 
     return (
         <section>
-            <h2>Create new proposals:</h2>
+            <h2>Create new proposals</h2>
+
+            {context.errorMessage &&
+                <ErrorMessage message={context.errorMessage} onClick={() => context.setErrorMessage(undefined)} />
+            }
 
             <AddUserProposalForm
-                defaultValue='tz1abTpHKkdo5YTM1DosZZVx9p8cjv4hMMTB'
+                defaultValue=''
                 handleSubmit={context.createAddUserProposal}
             />
+
             <RemoveUserProposalForm
-                defaultValue='tz1g6JRCpsEnD2BLiAzPNK3GBD1fKicV9rCx'
+                defaultValue={context.storage.users[0]}
+                users={context.storage.users}
                 handleSubmit={context.createRemoveUserProposal}
             />
+
             <MinimumVotesProposalForm
-                defaultValue='3'
+                defaultValue={context.storage.minimum_votes}
+                maxValue={context.storage.users.length}
                 handleSubmit={context.createMinimumVotesProposal}
             />
+
             <ExpirationTimeProposalForm
-                defaultValue='10'
+                defaultValue={context.storage.expiration_time}
                 handleSubmit={context.createExpirationTimeProposal}
             />
         </section>
@@ -55,7 +65,14 @@ function AddUserProposalForm(props) {
             <fieldset>
                 <legend>Add user proposal</legend>
                 <label>User to add:
-                    <input type='text' value={user} onChange={handleChange} />
+                    <input
+                        type='text'
+                        className='tezos-wallet-input'
+                        minLength='36'
+                        maxLength='36'
+                        value={user}
+                        onChange={handleChange}
+                    />
                 </label>
                 <input type='submit' value='send proposal' />
             </fieldset>
@@ -83,7 +100,13 @@ function RemoveUserProposalForm(props) {
             <fieldset>
                 <legend>Remove user proposal</legend>
                 <label>User to remove:
-                    <input type='text' value={user} onChange={handleChange} />
+                    <select value={user} onChange={handleChange}>
+                        {props.users.map((userWallet) => (
+                            <option key={userWallet} value={userWallet}>
+                                {userWallet}
+                            </option>
+                        ))}
+                    </select>
                 </label>
                 <input type='submit' value='send proposal' />
             </fieldset>
@@ -111,7 +134,7 @@ function MinimumVotesProposalForm(props) {
             <fieldset>
                 <legend>Minimum votes proposal</legend>
                 <label>New minimum votes:
-                    <input type='number' value={minimumVotes} step='1' onChange={handleChange} />
+                    <input type='number' value={minimumVotes} min='1' max={props.maxValue} step='1' onChange={handleChange} />
                 </label>
                 <input type='submit' value='send proposal' />
             </fieldset>
@@ -139,7 +162,7 @@ function ExpirationTimeProposalForm(props) {
             <fieldset>
                 <legend>Expiration time proposal</legend>
                 <label>New expiration time (days):
-                    <input type='number' value={expirationTime} step='1' onChange={handleChange} />
+                    <input type='number' value={expirationTime} min='1' step='1' onChange={handleChange} />
                 </label>
                 <input type='submit' value='send proposal' />
             </fieldset>

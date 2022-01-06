@@ -48,7 +48,9 @@ h4 {
 }
 
 .content-container {
-    margin: 1em 1em 0em 1em ;
+    padding: 1em 1em 0em 1em ;
+    max-width: 1500px;
+    margin: auto;
 }
 
 .tezos-address {
@@ -57,7 +59,7 @@ h4 {
     line-height: 1.1em;
 }
 
-button, input, .proposal-votes {
+button, input, select, .proposal-votes {
     font-family: monospace;
     font-size: 1.1em;
     line-height: 1.1em;
@@ -75,6 +77,11 @@ button, input[type=submit] {
     &:hover {
         background-color: $button-hover-background-color;
     }    
+}
+
+select {
+    cursor: pointer;
+    background-color: white;
 }
 
 li {
@@ -112,6 +119,10 @@ ul {
     }
 }
 
+.proposal-list {
+    overflow: auto;
+    max-height: 50em;
+}
 .proposal-list:not(:last-child) {
     margin-bottom: 3em;
 }
@@ -152,8 +163,40 @@ ul {
     background-color: $no-vote-background-color;
 }
 
-input {
-    margin-left: 0.5em;
+.tezos-wallet-input {
+    width: 38ch;
+}
+
+.message-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width:100%;
+    height: 100%;
+    background-color: $error-message-background-color;
+}
+
+.message {
+    background-color: $section-background-color;
+    min-width: 20em;
+    min-height: 10em;
+    max-width: 80%;
+    padding: 2em;
+    border-radius: 10px;
+
+    button {
+        float: right;
+    }
+}
+
+input[type=text], input[type=number], select {
+     margin-left: 0.5em;
+     margin-right: 0.5em;
+}
+
+input[type=number] {
+     width: 8ch;
+     text-align: center;
 }
 
 fieldset {
@@ -161,6 +204,10 @@ fieldset {
     padding: 2em;
     border: 1px solid $border-color;
     border-radius: 4px;
+
+    input[type=submit] {
+        float: right;
+    }
 }
 
 section {
