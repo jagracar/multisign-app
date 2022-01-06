@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { MultisignContext } from '../context';
 import { Button } from '../button';
-import { TezosAddressLink } from '../link';
+import { TzktLink, TezosAddressLink } from '../link';
 
 
 export function Proposals() {
@@ -120,7 +120,8 @@ function ProposalDescription(props) {
     if (kind === 'transfer_mutez') {
         return (
             <span className='proposal-description'>
-                <TezosAddressLink address={issuer} shorten /> proposed to transfer mutez to a given account.
+                <TezosAddressLink address={issuer} shorten /> proposed to transfer {proposal.mutez_amount/1000000}ꜩ 
+                to <TezosAddressLink address={proposal.destination} shorten />.
             </span>
         );
     }
@@ -128,7 +129,8 @@ function ProposalDescription(props) {
     if (kind === 'transfer_token') {
         return (
             <span className='proposal-description'>
-                <TezosAddressLink address={issuer} shorten /> proposed to transfer tokens to a given account.
+                <TezosAddressLink address={issuer} shorten /> proposed to transfer {proposal.token_amount} edition{proposal.token_amount > 1? 's' : ''} of 
+                token <TzktLink address={proposal.token_contract} className='tezos-address'>#{proposal.token_id}</TzktLink> to <TezosAddressLink address={proposal.destination} shorten />.
             </span>
         );
     }
@@ -136,7 +138,7 @@ function ProposalDescription(props) {
     if (kind === 'add_user') {
         return (
             <span className='proposal-description'>
-                <TezosAddressLink address={issuer} shorten /> proposed to add <TezosAddressLink address={proposal.user} /> to the multisign.
+                <TezosAddressLink address={issuer} shorten /> proposed to add <TezosAddressLink address={proposal.user} shorten /> to the multisign.
             </span>
         );
     }
@@ -144,7 +146,7 @@ function ProposalDescription(props) {
     if (kind === 'remove_user') {
         return (
             <span className='proposal-description'>
-                <TezosAddressLink address={issuer} shorten /> proposed to remove <TezosAddressLink address={proposal.user} /> from the multisign.
+                <TezosAddressLink address={issuer} shorten /> proposed to remove <TezosAddressLink address={proposal.user} shorten /> from the multisign.
             </span>
         );
     }

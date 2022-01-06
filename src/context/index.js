@@ -141,6 +141,9 @@ export class MultisignContextProvider extends React.Component {
 
         // Define the component state parameters
         this.state = {
+            // The tezos network
+            network: network,
+
             // The multisign contract address
             contractAddress: multisignContractAddress,
 
