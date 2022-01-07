@@ -281,19 +281,71 @@ export class MultisignContextProvider extends React.Component {
                 await this.state.setProposals();
             },
 
+            // Creates a transfer mutez proposal
+            createTransferMutezProposal: async (amount, destination) => {
+                // Return if the multisign contract reference is not available
+                if (!(await this.contractIsAvailable())) return;
+
+                // Check that the amount is smaller thant the contract balance
+                if (amount >= this.state.balance) {
+                    this.state.setErrorMessage('The provided tez amount is larger than the current contract balance');
+                    return;
+                }
+
+                // Check that the destination address is a valid address
+                if (destination && validateAddress(destination) !== 3) {
+                    this.state.setErrorMessage('The provided address is not a valid tezos address');
+                    return;
+                }
+
+                // Send the transfer mutez proposal operation
+                console.log('Sending the transfer mutez proposal operation...');
+                const operation = await this.state.contract.methods.transfer_mutez_proposal(amount, destination).send()
+                    .catch((error) => console.log('Error while sending the trasfer mutez proposal operation:', error));
+
+                // Wait for the confirmation
+                await this.confirmOperation(operation);
+
+                // Update the proposals
+                await this.state.setProposals();
+            },
+
+            // Creates a transfer token proposal
+            createTransferTokenProposal: async (tokenContract, tokenId, tokenAmount, destination) => {
+                // Return if the multisign contract reference is not available
+                if (!(await this.contractIsAvailable())) return;
+
+                // Check that the token contract address is a valid address
+                if (tokenContract && validateAddress(tokenContract) !== 3) {
+                    this.state.setErrorMessage('The provided token contract address is not a valid tezos address');
+                    return;
+                }
+
+                // Check that the destination address is a valid address
+                if (destination && validateAddress(destination) !== 3) {
+                    this.state.setErrorMessage('The provided address is not a valid tezos address');
+                    return;
+                }
+
+                // Send the transfer token proposal operation
+                console.log('Sending the transfer token proposal operation...');
+                const operation = await this.state.contract.methods.transfer_token_proposal(tokenContract, tokenId, tokenAmount, destination).send()
+                    .catch((error) => console.log('Error while sending the trasfer token proposal operation:', error));
+
+                // Wait for the confirmation
+                await this.confirmOperation(operation);
+
+                // Update the proposals
+                await this.state.setProposals();
+            },
+
             // Creates an add user proposal
             createAddUserProposal: async (userAddress) => {
                 // Return if the multisign contract reference is not available
                 if (!(await this.contractIsAvailable())) return;
 
-                // Check that the user address is not undefined
-                if (userAddress === undefined) {
-                    this.state.setErrorMessage('The provided address is undefined');
-                    return;
-                }
-
                 // Check that the user address is a valid address
-                if (validateAddress(userAddress) !== 3) {
+                if (userAddress && validateAddress(userAddress) !== 3) {
                     this.state.setErrorMessage('The provided address is not a valid tezos address');
                     return;
                 }
@@ -321,14 +373,8 @@ export class MultisignContextProvider extends React.Component {
                 // Return if the multisign contract reference is not available
                 if (!(await this.contractIsAvailable())) return;
 
-                // Check that the user address is not undefined
-                if (userAddress === undefined) {
-                    this.state.setErrorMessage('The provided address is undefined');
-                    return;
-                }
-
                 // Check that the user address is a valid address
-                if (validateAddress(userAddress) !== 3) {
+                if (userAddress && validateAddress(userAddress) !== 3) {
                     this.state.setErrorMessage('The provided address is not a valid tezos address');
                     return;
                 }
@@ -389,6 +435,33 @@ export class MultisignContextProvider extends React.Component {
                 console.log('Sending the expiration time proposal operation...');
                 const operation = await this.state.contract.methods.expiration_time_proposal(expirationTime).send()
                     .catch((error) => console.log('Error while sending the expiration time proposal operation:', error));
+
+                // Wait for the confirmation
+                await this.confirmOperation(operation);
+
+                // Update the proposals
+                await this.state.setProposals();
+            },
+
+            // Creates a lambda function proposal
+            createLambdaFunctionProposal: async (lambdaFunctionText) => {
+                // Return if the multisign contract reference is not available
+                if (!(await this.contractIsAvailable())) return;
+
+                // Try to get the lambda function assuming the lambda function text follows the json format
+                let lambdaFunction;
+
+                try {
+                    lambdaFunction = JSON.parse(lambdaFunctionText);
+                } catch (error) {
+                    this.state.setErrorMessage('The provided lambda function has an invalid JSON format');
+                    return;
+                }
+
+                // Send the lambda function proposal operation
+                console.log('Sending the lambda function proposal operation...');
+                const operation = await this.state.contract.methods.lambda_proposal(lambdaFunction).send()
+                    .catch((error) => console.log('Error while sending the lambda function proposal operation:', error));
 
                 // Wait for the confirmation
                 await this.confirmOperation(operation);

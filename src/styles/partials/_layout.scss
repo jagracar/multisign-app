@@ -73,3 +73,14 @@ html, body {
     justify-content: center;
     align-items: center;
 }
+
+// 8th flexbox group
+fieldset {
+    display: flex;
+    align-items: baseline;
+    gap: 1em;
+}
+
+.proposal-input {
+    flex: 1 1 auto;
+}

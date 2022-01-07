@@ -111,71 +111,90 @@ function ProposalDescription(props) {
 
     if (kind === 'text') {
         return (
-            <span className='proposal-description'>
+            <p className='proposal-description'>
                 <TezosAddressLink address={issuer} shorten /> proposed to approve the following text...
-            </span>
+            </p>
         );
     }
 
     if (kind === 'transfer_mutez') {
         return (
-            <span className='proposal-description'>
-                <TezosAddressLink address={issuer} shorten /> proposed to transfer {proposal.mutez_amount/1000000}ꜩ 
-                to <TezosAddressLink address={proposal.destination} shorten />.
-            </span>
+            <p className='proposal-description'>
+                <TezosAddressLink address={issuer} shorten /> proposed to transfer {proposal.mutez_amount/1000000} ꜩ to
+                {' '}
+                <TezosAddressLink address={proposal.destination} shorten />.
+            </p>
         );
     }
 
     if (kind === 'transfer_token') {
         return (
-            <span className='proposal-description'>
-                <TezosAddressLink address={issuer} shorten /> proposed to transfer {proposal.token_amount} edition{proposal.token_amount > 1? 's' : ''} of 
-                token <TzktLink address={proposal.token_contract} className='tezos-address'>#{proposal.token_id}</TzktLink> to <TezosAddressLink address={proposal.destination} shorten />.
-            </span>
+            <p className='proposal-description'>
+                <TezosAddressLink address={issuer} shorten /> proposed to transfer
+                {' '}
+                {proposal.token_amount} edition{proposal.token_amount > 1? 's' : ''} of token
+                {' '}
+                <TzktLink address={proposal.token_contract} className='tezos-address'>
+                    #{proposal.token_id}
+                </TzktLink> to
+                {' '}
+                <TezosAddressLink address={proposal.destination} shorten />.
+            </p>
         );
     }
 
     if (kind === 'add_user') {
         return (
-            <span className='proposal-description'>
-                <TezosAddressLink address={issuer} shorten /> proposed to add <TezosAddressLink address={proposal.user} shorten /> to the multisign.
-            </span>
+            <p className='proposal-description'>
+                <TezosAddressLink address={issuer} shorten /> proposed to add
+                {' '}
+                <TezosAddressLink address={proposal.user} shorten /> to the multisign.
+            </p>
         );
     }
 
     if (kind === 'remove_user') {
         return (
-            <span className='proposal-description'>
-                <TezosAddressLink address={issuer} shorten /> proposed to remove <TezosAddressLink address={proposal.user} shorten /> from the multisign.
-            </span>
+            <p className='proposal-description'>
+                <TezosAddressLink address={issuer} shorten /> proposed to remove
+                {' '}
+                <TezosAddressLink address={proposal.user} shorten /> from the multisign.
+            </p>
         );
     }
 
     if (kind === 'minimum_votes') {
         return (
-            <span className='proposal-description'>
-                <TezosAddressLink address={issuer} shorten /> proposed to change the minimum positive votes required to approve a proposal to {proposal.minimum_votes} votes.
-            </span>
+            <p className='proposal-description'>
+                <TezosAddressLink address={issuer} shorten /> proposed to change the
+                minimum positive votes required to approve a proposal to {proposal.minimum_votes} votes.
+            </p>
         );
     }
 
     if (kind === 'expiration_time') {
         return (
-            <span className='proposal-description'>
-                <TezosAddressLink address={issuer} shorten /> proposed to change the proposals expiration time to {proposal.expiration_time} days.
-            </span>
+            <p className='proposal-description'>
+                <TezosAddressLink address={issuer} shorten /> proposed to change the
+                proposals expiration time to {proposal.expiration_time} days.
+            </p>
         );
     }
 
     if (kind === 'lambda') {
         return (
-            <span className='proposal-description'>
-                <TezosAddressLink address={issuer} shorten /> proposed to execute a lambda function.
-            </span>
+            <div className='proposal-description'>
+                <p><TezosAddressLink address={issuer} shorten /> proposed to execute a lambda function.</p>
+
+                <details>
+                    <summary>See Michelson JSON code</summary>
+                    <pre>{JSON.stringify(JSON.parse(proposal.lambda_function), null, 4)}</pre>
+                </details>
+            </div>
         );
     }
 
-    return;
+    return null;
 }
 
 function ProposalExtraInformation(props) {

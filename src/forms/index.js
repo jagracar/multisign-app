@@ -20,20 +20,25 @@ export function CreateProposalForms(props) {
                 <ErrorMessage message={context.errorMessage} onClick={() => context.setErrorMessage(undefined)} />
             }
 
+            <TransferTezProposalForm
+                handleSubmit={context.createTransferMutezProposal}
+            />
+
+            <TransferTokenProposalForm
+                handleSubmit={context.createTransferTokenProposal}
+            />
+
             <AddUserProposalForm
-                defaultValue=''
                 handleSubmit={context.createAddUserProposal}
             />
 
             <RemoveUserProposalForm
-                defaultValue={context.storage.users[0]}
                 users={context.storage.users}
                 handleSubmit={context.createRemoveUserProposal}
             />
 
             <MinimumVotesProposalForm
                 defaultValue={context.storage.minimum_votes}
-                maxValue={context.storage.users.length}
                 handleSubmit={context.createMinimumVotesProposal}
             />
 
@@ -41,13 +46,166 @@ export function CreateProposalForms(props) {
                 defaultValue={context.storage.expiration_time}
                 handleSubmit={context.createExpirationTimeProposal}
             />
+
+            <LambdaFunctionProposalForm
+                handleSubmit={context.createLambdaFunctionProposal}
+            />
         </section>
+    );
+}
+
+function TransferTezProposalForm(props) {
+    // Set the component state
+    const [amount, setAmount] = useState(0);
+    const [destination, setDestination] = useState('');
+
+    // Define the on change handlers
+    const handleAmountChange = (e) => {
+        setAmount(e.target.value);
+    };
+
+    const handleDestinationChange = (e) => {
+        setDestination(e.target.value);
+    };
+
+    // Define the on submit handler
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        props.handleSubmit(amount * 1000000, destination);
+    };
+
+    return (
+        <form onSubmit={handleSubmit}>
+            <fieldset>
+                <legend>Transfer tez proposal</legend>
+                <div className='proposal-input'>
+                    <label>Amount to transfer (ꜩ):
+                        <input
+                            type='number'
+                            min='0'
+                            step='0.000001'
+                            value={amount}
+                            onChange={handleAmountChange} />
+                    </label>
+                    <br />
+                    <label>Destination address:
+                        <input
+                            type='text'
+                            spellCheck='false'
+                            minLength='36'
+                            maxLength='36'
+                            className='tezos-wallet-input'
+                            value={destination}
+                            onChange={handleDestinationChange}
+                        />
+                    </label>
+                </div>
+                <input type='submit' value='send proposal' />
+            </fieldset>
+        </form>
+    );
+}
+
+function TransferTokenProposalForm(props) {
+    // Set the component state
+    const [tokenContract, setTokenContract] = useState('');
+    const [tokenId, setTokenId] = useState('');
+    const [tokenAmount, setTokenAmount] = useState(1);
+    const [destination, setDestination] = useState('');
+
+    // Define the on change handlers
+    const handleTokenContractChange = (e) => {
+        setTokenContract(e.target.value);
+    };
+
+    const handleTokenIdChange = (e) => {
+        setTokenId(e.target.value);
+    };
+
+    const handleTokenAmountChange = (e) => {
+        setTokenAmount(e.target.value);
+    };
+
+    const handleDestinationChange = (e) => {
+        setDestination(e.target.value);
+    };
+
+    // Define the on submit handler
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        props.handleSubmit(tokenContract, tokenId, tokenAmount, destination);
+    };
+
+    return (
+        <form onSubmit={handleSubmit}>
+            <fieldset>
+                <legend>Transfer tez proposal</legend>
+                <div className='proposal-input'>
+                    <label>Token contract address:
+                        <input
+                            type='text'
+                            list='tokenContracts'
+                            spellCheck='false'
+                            minLength='36'
+                            maxLength='36'
+                            className='token-contract-input'
+                            value={tokenContract}
+                            onChange={handleTokenContractChange}
+                            onMouseDown={() => setTokenContract('')}
+                        />
+                        <datalist id='tokenContracts'>
+                            <option value=''></option>
+                            <option value='KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton'>OBJKT</option>
+                            <option value='KT1AFA2mwNUMNd4SsujE1YYp29vd8BZejyKW'>hDAO</option>
+                            <option value='KT1LHHLso8zQWQWg1HUukajdxxbkGfNoHjh6'>Tezzardz</option>
+                            <option value='KT1VbHpQmtkA3D4uEbbju26zS8C42M5AGNjZ'>PRJKTNEON</option>
+                            <option value='KT1LbLNTTPoLgpumACCBFJzBEHDiEUqNxz5C'>Art Cardz</option>
+                            <option value='KT1SyPgtiXTaEfBuMZKviWGNHqVrBBEjvtfQ'>GOGOs</option>
+                            <option value='KT1MsdyBSAMQwzvDH4jt2mxUKJvBSWZuPoRJ'>NEONZ</option>
+                            <option value='KT1HZVd9Cjc2CMe3sQvXgbxhpJkdena21pih'>Randomly Common Skeles</option>
+                            <option value='KT1PNcZQkJXMQ2Mg92HG1kyrcu3auFX5pfd8'>ZIGGURATS</option>
+                        </datalist>
+                    </label>
+                    <br />
+                    <label>Token Id:
+                        <input
+                            type='number'
+                            min='0'
+                            step='1'
+                            value={tokenId}
+                            onChange={handleTokenIdChange} />
+                    </label>
+                    <br />
+                    <label>Token editions:
+                        <input
+                            type='number'
+                            min='1'
+                            step='1'
+                            value={tokenAmount}
+                            onChange={handleTokenAmountChange} />
+                    </label>
+                    <br />
+                    <label>Destination address:
+                        <input
+                            type='text'
+                            spellCheck='false'
+                            minLength='36'
+                            maxLength='36'
+                            className='tezos-wallet-input'
+                            value={destination}
+                            onChange={handleDestinationChange}
+                        />
+                    </label>
+                </div>
+                <input type='submit' value='send proposal' />
+            </fieldset>
+        </form>
     );
 }
 
 function AddUserProposalForm(props) {
     // Set the component state
-    const [user, setUser] = useState(props.defaultValue);
+    const [user, setUser] = useState('');
 
     // Define the on change handler
     const handleChange = (e) => {
@@ -64,12 +222,13 @@ function AddUserProposalForm(props) {
         <form onSubmit={handleSubmit}>
             <fieldset>
                 <legend>Add user proposal</legend>
-                <label>User to add:
+                <label className='proposal-input'>User to add:
                     <input
                         type='text'
-                        className='tezos-wallet-input'
+                        spellCheck='false'
                         minLength='36'
                         maxLength='36'
+                        className='tezos-wallet-input'
                         value={user}
                         onChange={handleChange}
                     />
@@ -82,7 +241,7 @@ function AddUserProposalForm(props) {
 
 function RemoveUserProposalForm(props) {
     // Set the component state
-    const [user, setUser] = useState(props.defaultValue);
+    const [user, setUser] = useState(props.users[0]);
 
     // Define the on change handler
     const handleChange = (e) => {
@@ -99,7 +258,7 @@ function RemoveUserProposalForm(props) {
         <form onSubmit={handleSubmit}>
             <fieldset>
                 <legend>Remove user proposal</legend>
-                <label>User to remove:
+                <label className='proposal-input'>User to remove:
                     <select value={user} onChange={handleChange}>
                         {props.users.map((userWallet) => (
                             <option key={userWallet} value={userWallet}>
@@ -133,8 +292,13 @@ function MinimumVotesProposalForm(props) {
         <form onSubmit={handleSubmit}>
             <fieldset>
                 <legend>Minimum votes proposal</legend>
-                <label>New minimum votes:
-                    <input type='number' value={minimumVotes} min='1' max={props.maxValue} step='1' onChange={handleChange} />
+                <label className='proposal-input'>New minimum votes:
+                    <input
+                        type='number'
+                        min='1'
+                        step='1'
+                        value={minimumVotes}
+                        onChange={handleChange} />
                 </label>
                 <input type='submit' value='send proposal' />
             </fieldset>
@@ -161,8 +325,46 @@ function ExpirationTimeProposalForm(props) {
         <form onSubmit={handleSubmit}>
             <fieldset>
                 <legend>Expiration time proposal</legend>
-                <label>New expiration time (days):
-                    <input type='number' value={expirationTime} min='1' step='1' onChange={handleChange} />
+                <label className='proposal-input'>New expiration time (days):
+                    <input
+                        type='number'
+                        min='1'
+                        step='1'
+                        value={expirationTime}
+                        onChange={handleChange}
+                    />
+                </label>
+                <input type='submit' value='send proposal' />
+            </fieldset>
+        </form>
+    );
+}
+
+function LambdaFunctionProposalForm(props) {
+    // Set the component state
+    const [lambdaFunction, setLambdaFunction] = useState('');
+
+    // Define the on change handler
+    const handleChange = (e) => {
+        setLambdaFunction(e.target.value);
+    };
+
+    // Define the on submit handler
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        props.handleSubmit(lambdaFunction);
+    };
+
+    return (
+        <form onSubmit={handleSubmit}>
+            <fieldset>
+                <legend>Lambda function proposal</legend>
+                <label className='proposal-input'>Lambda function in Michelson JSON format:
+                    <textarea
+                        spellCheck='false'
+                        value={lambdaFunction}
+                        onChange={handleChange}
+                    />
                 </label>
                 <input type='submit' value='send proposal' />
             </fieldset>

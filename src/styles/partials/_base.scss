@@ -84,6 +84,10 @@ select {
     background-color: white;
 }
 
+summary {
+    cursor: pointer;
+}
+
 li {
     list-style-type: none;
 }
@@ -142,6 +146,7 @@ ul {
 }
 
 .proposal-description {
+    margin: 0;
     padding: 0.5em 1em;
     border-left: 1px solid $border-color;
 }
@@ -167,6 +172,10 @@ ul {
     width: 38ch;
 }
 
+.token-contract-input {
+    width: 41ch;
+}
+
 .message-container {
     position: fixed;
     top: 0;
@@ -189,25 +198,20 @@ ul {
     }
 }
 
-input[type=text], input[type=number], select {
-     margin-left: 0.5em;
-     margin-right: 0.5em;
-}
-
-input[type=number] {
-     width: 8ch;
-     text-align: center;
-}
-
 fieldset {
-    margin-bottom: 2em;
+    margin: 0 0 2em 0;
     padding: 2em;
     border: 1px solid $border-color;
     border-radius: 4px;
+}
 
-    input[type=submit] {
-        float: right;
-    }
+input, select {
+    margin: 0.5em;
+}
+
+input[type=number] {
+    width: 13ch;
+    text-align: right;
 }
 
 section {
@@ -216,6 +220,29 @@ section {
     background-color: $section-background-color;
     border: 1px solid $border-color;
     border-radius: 10px;
+}
+
+pre {
+    font-family: monospace;
+    font-size: 0.9em;
+    line-height: 1.3em;    
+    background-color: white;
+}
+
+textarea {
+    display: block;
+    font-family: monospace;
+    font-size: 1.1em;
+    line-height: 1.1em;
+    color: $general-text-color;
+    background-color: white;
+    border: 1px solid $border-color;
+    border-radius: 4px;
+    width: 100%;
+    min-height: 10em;
+    margin: 1em 0;
+    padding: 0.5em;
+    resize: none;
 }
 
 footer {
