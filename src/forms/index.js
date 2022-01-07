@@ -59,13 +59,14 @@ function TransferTezProposalForm(props) {
     const [amount, setAmount] = useState(0);
     const [destination, setDestination] = useState('');
 
-    // Define the on change handlers
-    const handleAmountChange = (e) => {
-        setAmount(e.target.value);
+    const setStatus = {
+        'amount': setAmount,
+        'destination': setDestination
     };
 
-    const handleDestinationChange = (e) => {
-        setDestination(e.target.value);
+    // Define the on change handler
+    const handleChange = (e) => {
+        setStatus[e.target.name](e.target.value);
     };
 
     // Define the on submit handler
@@ -81,22 +82,24 @@ function TransferTezProposalForm(props) {
                 <div className='proposal-input'>
                     <label>Amount to transfer (ꜩ):
                         <input
+                            name='amount'
                             type='number'
                             min='0'
                             step='0.000001'
                             value={amount}
-                            onChange={handleAmountChange} />
+                            onChange={handleChange} />
                     </label>
                     <br />
                     <label>Destination address:
                         <input
+                            name='destination'
                             type='text'
                             spellCheck='false'
                             minLength='36'
                             maxLength='36'
                             className='tezos-wallet-input'
                             value={destination}
-                            onChange={handleDestinationChange}
+                            onChange={handleChange}
                         />
                     </label>
                 </div>
@@ -113,21 +116,16 @@ function TransferTokenProposalForm(props) {
     const [tokenAmount, setTokenAmount] = useState(1);
     const [destination, setDestination] = useState('');
 
-    // Define the on change handlers
-    const handleTokenContractChange = (e) => {
-        setTokenContract(e.target.value);
+    const setStatus = {
+        'tokenContract': setTokenContract,
+        'tokenId': setTokenId,
+        'tokenAmount': setTokenAmount,
+        'destination': setDestination
     };
 
-    const handleTokenIdChange = (e) => {
-        setTokenId(e.target.value);
-    };
-
-    const handleTokenAmountChange = (e) => {
-        setTokenAmount(e.target.value);
-    };
-
-    const handleDestinationChange = (e) => {
-        setDestination(e.target.value);
+    // Define the on change handler
+    const handleChange = (e) => {
+        setStatus[e.target.name](e.target.value);
     };
 
     // Define the on submit handler
@@ -139,10 +137,11 @@ function TransferTokenProposalForm(props) {
     return (
         <form onSubmit={handleSubmit}>
             <fieldset>
-                <legend>Transfer tez proposal</legend>
+                <legend>Transfer token proposal</legend>
                 <div className='proposal-input'>
                     <label>Token contract address:
                         <input
+                            name='tokenContract'
                             type='text'
                             list='tokenContracts'
                             spellCheck='false'
@@ -150,7 +149,7 @@ function TransferTokenProposalForm(props) {
                             maxLength='36'
                             className='token-contract-input'
                             value={tokenContract}
-                            onChange={handleTokenContractChange}
+                            onChange={handleChange}
                             onMouseDown={() => setTokenContract('')}
                         />
                         <datalist id='tokenContracts'>
@@ -169,31 +168,34 @@ function TransferTokenProposalForm(props) {
                     <br />
                     <label>Token Id:
                         <input
+                            name='tokenId'
                             type='number'
                             min='0'
                             step='1'
                             value={tokenId}
-                            onChange={handleTokenIdChange} />
+                            onChange={handleChange} />
                     </label>
                     <br />
                     <label>Token editions:
                         <input
+                            name='tokenAmount'
                             type='number'
                             min='1'
                             step='1'
                             value={tokenAmount}
-                            onChange={handleTokenAmountChange} />
+                            onChange={handleChange} />
                     </label>
                     <br />
                     <label>Destination address:
                         <input
+                            name='destination'
                             type='text'
                             spellCheck='false'
                             minLength='36'
                             maxLength='36'
                             className='tezos-wallet-input'
                             value={destination}
-                            onChange={handleDestinationChange}
+                            onChange={handleChange}
                         />
                     </label>
                 </div>
