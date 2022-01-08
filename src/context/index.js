@@ -2,6 +2,7 @@ import React, { createContext } from 'react';
 import { TezosToolkit } from '@taquito/taquito';
 import { validateAddress } from '@taquito/utils';
 import { BeaconWallet } from '@taquito/beacon-wallet';
+import { Parser } from '@taquito/michel-codec';
 import axios from 'axios';
 import { ConfirmationMessage } from '../messages';
 
@@ -444,17 +445,18 @@ export class MultisignContextProvider extends React.Component {
             },
 
             // Creates a lambda function proposal
-            createLambdaFunctionProposal: async (lambdaFunctionText) => {
+            createLambdaFunctionProposal: async (michelineCode) => {
                 // Return if the multisign contract reference is not available
                 if (!(await this.contractIsAvailable())) return;
 
-                // Try to get the lambda function assuming the lambda function text follows the json format
+                // Try to get the lambda function from the Micheline code
                 let lambdaFunction;
 
                 try {
-                    lambdaFunction = JSON.parse(lambdaFunctionText);
+                    const parser = new Parser();
+                    lambdaFunction = parser.parseMichelineExpression(michelineCode);
                 } catch (error) {
-                    this.state.setErrorMessage('The provided lambda function has an invalid JSON format');
+                    this.state.setErrorMessage('The provided lambda function Michelson code is not correct');
                     return;
                 }
 

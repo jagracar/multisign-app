@@ -53,10 +53,27 @@ h4 {
     margin: auto;
 }
 
+.sync-container{
+    margin: 0.5em 0;
+}
+
 .tezos-address {
     font-family: monospace;
     font-size: 1.1em;
     line-height: 1.1em;
+}
+
+.micheline-code {
+    font-family: monospace;
+    font-size: 1.1em;
+    line-height: 1.6em;
+    background-color: white;
+    display: inline-block;
+    border: 1px solid $border-color;
+    padding: 0.5em;
+    border-radius: 10px;
+    white-space: pre-wrap;
+    word-break: break-word;
 }
 
 button, input, select, .proposal-votes {
@@ -82,6 +99,10 @@ button, input[type=submit] {
 select {
     cursor: pointer;
     background-color: white;
+
+    option {
+        paddingt: 2.3em;
+    }
 }
 
 summary {
@@ -127,6 +148,7 @@ ul {
     overflow: auto;
     max-height: 50em;
 }
+
 .proposal-list:not(:last-child) {
     margin-bottom: 3em;
 }
@@ -141,6 +163,9 @@ ul {
 }
 
 .proposal-timestamp {
+    font-family: monospace;
+    font-size: 1.1em;
+    line-height: 1.1em;
     padding: 0.5em 0em;
     padding-right: 1em;
 }
@@ -205,8 +230,8 @@ fieldset {
     border-radius: 4px;
 }
 
-input, select {
-    margin: 0.5em;
+input, select, textarea {
+    margin: 0.5em 0;
 }
 
 input[type=number] {
@@ -239,8 +264,7 @@ textarea {
     border: 1px solid $border-color;
     border-radius: 4px;
     width: 100%;
-    min-height: 10em;
-    margin: 1em 0;
+    min-height: 7em;
     padding: 0.5em;
     resize: none;
 }

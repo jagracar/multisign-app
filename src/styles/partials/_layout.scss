@@ -16,6 +16,7 @@ html, body {
 .header-container {
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
     justify-content: space-between;
     align-items: flex-start;
 }
@@ -24,6 +25,7 @@ html, body {
 .sync-container {
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
     justify-content: flex-end;
     align-items: baseline;
     column-gap: 1em;
@@ -63,6 +65,7 @@ html, body {
 .proposal-extra-information {
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
     justify-content: flex-end;
     gap: 0.5em;
 }
@@ -77,6 +80,7 @@ html, body {
 // 8th flexbox group
 fieldset {
     display: flex;
+    flex-wrap: wrap;
     align-items: baseline;
     gap: 1em;
 }

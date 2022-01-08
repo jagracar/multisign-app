@@ -1,4 +1,6 @@
 import React, { useContext } from 'react';
+import { Parser, emitMicheline } from '@taquito/michel-codec';
+import { encodePubKey } from '@taquito/utils';
 import { MultisignContext } from '../context';
 import { Button } from '../button';
 import { TzktLink, TezosAddressLink } from '../link';
@@ -182,13 +184,26 @@ function ProposalDescription(props) {
     }
 
     if (kind === 'lambda') {
+        // Transform the lambda function Michelson JSON code to Micheline code
+        const parser = new Parser();
+        const michelsonCode = parser.parseJSON(JSON.parse(proposal.lambda_function));
+        const michelineCode = emitMicheline(michelsonCode, {indent:'    ', newline: '\n',});
+
+        // Encode any addresses that the Micheline code might contain
+        const encodedMichelineCode = michelineCode.replace(
+            /0x0[0123]{1}[\w\d]{42}/g,
+            (match) => `"${encodePubKey(match.slice(2))}"`
+        );
+
         return (
             <div className='proposal-description'>
                 <p><TezosAddressLink address={issuer} shorten /> proposed to execute a lambda function.</p>
 
                 <details>
-                    <summary>See Michelson JSON code</summary>
-                    <pre>{JSON.stringify(JSON.parse(proposal.lambda_function), null, 4)}</pre>
+                    <summary>See Micheline code</summary>
+                    <pre className='micheline-code'>
+                        {encodedMichelineCode}
+                    </pre>
                 </details>
             </div>
         );

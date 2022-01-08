@@ -18,7 +18,7 @@ export function Header() {
 
     return (
         <header className='header-container'>
-            <h1>Multising control panel</h1>
+            <h1>Multisign control panel</h1>
 
             <div className='sync-container'>
                 {address && <TezosAddressLink address={address} shorten />}

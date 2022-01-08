@@ -344,27 +344,27 @@ function ExpirationTimeProposalForm(props) {
 
 function LambdaFunctionProposalForm(props) {
     // Set the component state
-    const [lambdaFunction, setLambdaFunction] = useState('');
+    const [michelineCode, setMichelineCode] = useState('');
 
     // Define the on change handler
     const handleChange = (e) => {
-        setLambdaFunction(e.target.value);
+        setMichelineCode(e.target.value);
     };
 
     // Define the on submit handler
     const handleSubmit = (e) => {
         e.preventDefault();
-        props.handleSubmit(lambdaFunction);
+        props.handleSubmit(michelineCode);
     };
 
     return (
         <form onSubmit={handleSubmit}>
             <fieldset>
                 <legend>Lambda function proposal</legend>
-                <label className='proposal-input'>Lambda function in Michelson JSON format:
+                <label className='proposal-input'>Lambda function code in Micheline format:
                     <textarea
                         spellCheck='false'
-                        value={lambdaFunction}
+                        value={michelineCode}
                         onChange={handleChange}
                     />
                 </label>
