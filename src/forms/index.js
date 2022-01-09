@@ -1,5 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { MultisignContext } from '../context';
+import { Button } from '../button';
+import { IpfsLink } from '../link';
 import { ErrorMessage } from '../messages';
 
 
@@ -19,6 +21,11 @@ export function CreateProposalForms(props) {
             {context.errorMessage &&
                 <ErrorMessage message={context.errorMessage} onClick={() => context.setErrorMessage(undefined)} />
             }
+
+            <TextProposalForm
+                uploadToIpfs={context.uploadToIpfs}
+                handleSubmit={context.createTextProposal}
+            />
 
             <TransferTezProposalForm
                 handleSubmit={context.createTransferMutezProposal}
@@ -54,25 +61,116 @@ export function CreateProposalForms(props) {
     );
 }
 
-function TransferTezProposalForm(props) {
+function TextProposalForm(props) {
     // Set the component state
-    const [amount, setAmount] = useState(0);
-    const [destination, setDestination] = useState('');
-
-    const setStatus = {
-        'amount': setAmount,
-        'destination': setDestination
-    };
+    const [file, setFile] = useState(undefined);
+    const [ipfsPath, setIpfsPath] = useState(undefined);
 
     // Define the on change handler
     const handleChange = (e) => {
-        setStatus[e.target.name](e.target.value);
+        setFile(e.target.files[0]);
+        setIpfsPath(undefined);
+    };
+
+    // Define the on click handler
+    const handleClick = async (e) => {
+        e.preventDefault();
+
+        // Update the component state
+        setIpfsPath(await props.uploadToIpfs(file));
     };
 
     // Define the on submit handler
     const handleSubmit = (e) => {
         e.preventDefault();
-        props.handleSubmit(amount * 1000000, destination);
+        props.handleSubmit(ipfsPath);
+    };
+
+    return (
+        <form onSubmit={handleSubmit}>
+            <fieldset>
+                <legend>Text proposal</legend>
+                <div className='proposal-input'>
+                    <label>File with the text to approve:
+                        {' '}
+                        <input
+                            type='file'
+                            onChange={handleChange}
+                        />
+                    </label>
+                    {file &&
+                        <div>
+                            <Button text={ipfsPath? 'uploaded' : 'upload to IPFS'} onClick={handleClick} />
+                            {' '}
+                            {ipfsPath &&
+                                <IpfsLink path={ipfsPath} />
+                            }
+                        </div>
+                    }
+                </div>
+                <input type='submit' value='send proposal' />
+            </fieldset>
+        </form>
+    );
+}
+
+function TransferTezProposalForm(props) {
+    // Set the component state
+    const [transfers, setTransfers] = useState([
+        {amount: 0, destination: ''}
+    ]);
+
+    // Define the on change handler
+    const handleChange = (index, parameter, value) => {
+        // Create a new transfers array
+        const newTransfers = transfers.map((transfer, i) => {
+            // Create a new transfer
+            const newTransfer = {
+                amount: transfer.amount,
+                destination: transfer.destination
+            };
+
+            // Update the value if we are at the correct index position
+            if (i === index) {
+                newTransfer[parameter] = value;
+            }
+
+            return newTransfer;
+        });
+
+        // Update the component state
+        setTransfers(newTransfers);
+    };
+
+    // Define the on click handler
+    const handleClick = (e, increase) => {
+        e.preventDefault();
+
+        // Create a new transfers array
+        const newTransfers = transfers.map((transfer) => (
+            {amount: transfer.amount, destination: transfer.destination}
+        ));
+
+        // Add or remove a transfer from the list
+        if (increase) {
+            newTransfers.push({amount: 0, destination: ''});
+        } else if (newTransfers.length > 1) {
+            newTransfers.pop();
+        }
+
+        // Update the component state
+        setTransfers(newTransfers);
+    };
+
+    // Define the on submit handler
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        props.handleSubmit(
+            transfers.map((transfer) => ({
+                amount: transfer.amount * 1000000,
+                destination: transfer.destination
+            }))
+        );
     };
 
     return (
@@ -80,30 +178,36 @@ function TransferTezProposalForm(props) {
             <fieldset>
                 <legend>Transfer tez proposal</legend>
                 <div className='proposal-input'>
-                    <label>Amount to transfer (ꜩ):
-                        {' '}
-                        <input
-                            name='amount'
-                            type='number'
-                            min='0'
-                            step='0.000001'
-                            value={amount}
-                            onChange={handleChange} />
-                    </label>
-                    <br />
-                    <label>Destination address:
-                        {' '}
-                        <input
-                            name='destination'
-                            type='text'
-                            spellCheck='false'
-                            minLength='36'
-                            maxLength='36'
-                            className='tezos-wallet-input'
-                            value={destination}
-                            onChange={handleChange}
-                        />
-                    </label>
+                    {transfers.map((transfer, index) => (
+                        <div key={index}  className='transfer-input'>
+                            <label>Amount to transfer (ꜩ):
+                                {' '}
+                                <input
+                                    type='number'
+                                    min='0'
+                                    step='0.000001'
+                                    value={transfer.amount}
+                                    onChange={(e) => handleChange(index, 'amount', e.target.value)}
+                                />
+                            </label>
+                            <br />
+                            <label>Destination address:
+                                {' '}
+                                <input
+                                    type='text'
+                                    spellCheck='false'
+                                    minLength='36'
+                                    maxLength='36'
+                                    className='tezos-wallet-input'
+                                    value={transfer.destination}
+                                    onChange={(e) => handleChange(index, 'destination', e.target.value)}
+                                />
+                            </label>
+                        </div>
+                    ))}
+                    <Button text='+' onClick={(e) => handleClick(e, true)} />
+                    {' '}
+                    <Button text='-' onClick={(e) => handleClick(e, false)} />
                 </div>
                 <input type='submit' value='send proposal' />
             </fieldset>
@@ -115,25 +219,56 @@ function TransferTokenProposalForm(props) {
     // Set the component state
     const [tokenContract, setTokenContract] = useState('');
     const [tokenId, setTokenId] = useState('');
-    const [tokenAmount, setTokenAmount] = useState(1);
-    const [destination, setDestination] = useState('');
-
-    const setStatus = {
-        'tokenContract': setTokenContract,
-        'tokenId': setTokenId,
-        'tokenAmount': setTokenAmount,
-        'destination': setDestination
-    };
+    const [transfers, setTransfers] = useState([
+        {amount: 0, destination: ''}
+    ]);
 
     // Define the on change handler
-    const handleChange = (e) => {
-        setStatus[e.target.name](e.target.value);
+    const handleChange = (index, parameter, value) => {
+        // Create a new transfers array
+        const newTransfers = transfers.map((transfer, i) => {
+            // Create a new transfer
+            const newTransfer = {
+                amount: transfer.amount,
+                destination: transfer.destination
+            };
+
+            // Update the value if we are at the correct index position
+            if (i === index) {
+                newTransfer[parameter] = value;
+            }
+
+            return newTransfer;
+        });
+
+        // Update the component state
+        setTransfers(newTransfers);
+    };
+
+    // Define the on click handler
+    const handleClick = (e, increase) => {
+        e.preventDefault();
+
+        // Create a new transfers array
+        const newTransfers = transfers.map((transfer) => (
+            {amount: transfer.amount, destination: transfer.destination}
+        ));
+
+        // Add or remove a transfer from the list
+        if (increase) {
+            newTransfers.push({amount: 0, destination: ''});
+        } else if (newTransfers.length > 1) {
+            newTransfers.pop();
+        }
+
+        // Update the component state
+        setTransfers(newTransfers);
     };
 
     // Define the on submit handler
     const handleSubmit = (e) => {
         e.preventDefault();
-        props.handleSubmit(tokenContract, tokenId, tokenAmount, destination);
+        props.handleSubmit(tokenContract, tokenId, transfers);
     };
 
     return (
@@ -144,7 +279,6 @@ function TransferTokenProposalForm(props) {
                     <label>Token contract address:
                         {' '}
                         <input
-                            name='tokenContract'
                             type='text'
                             list='tokenContracts'
                             spellCheck='false'
@@ -152,7 +286,7 @@ function TransferTokenProposalForm(props) {
                             maxLength='36'
                             className='token-contract-input'
                             value={tokenContract}
-                            onChange={handleChange}
+                            onChange={(e) => setTokenContract(e.target.value)}
                             onMouseDown={() => setTokenContract('')}
                         />
                         <datalist id='tokenContracts'>
@@ -172,38 +306,43 @@ function TransferTokenProposalForm(props) {
                     <label>Token Id:
                         {' '}
                         <input
-                            name='tokenId'
                             type='number'
                             min='0'
                             step='1'
                             value={tokenId}
-                            onChange={handleChange} />
+                            onChange={(e) => setTokenId(e.target.value)} />
                     </label>
                     <br />
-                    <label>Token editions:
-                        {' '}
-                        <input
-                            name='tokenAmount'
-                            type='number'
-                            min='1'
-                            step='1'
-                            value={tokenAmount}
-                            onChange={handleChange} />
-                    </label>
-                    <br />
-                    <label>Destination address:
-                        {' '}
-                        <input
-                            name='destination'
-                            type='text'
-                            spellCheck='false'
-                            minLength='36'
-                            maxLength='36'
-                            className='tezos-wallet-input'
-                            value={destination}
-                            onChange={handleChange}
-                        />
-                    </label>
+                    {transfers.map((transfer, index) => (
+                        <div key={index}  className='transfer-input'>
+                            <label>Token editions:
+                                {' '}
+                                <input
+                                    type='number'
+                                    min='1'
+                                    step='1'
+                                    value={transfer.amount}
+                                    onChange={(e) => handleChange(index, 'amount', e.target.value)}
+                                />
+                            </label>
+                            <br />
+                            <label>Destination address:
+                                {' '}
+                                <input
+                                    type='text'
+                                    spellCheck='false'
+                                    minLength='36'
+                                    maxLength='36'
+                                    className='tezos-wallet-input'
+                                    value={transfer.destination}
+                                    onChange={(e) => handleChange(index, 'destination', e.target.value)}
+                                />
+                            </label>
+                        </div>
+                    ))}
+                    <Button text='+' onClick={(e) => handleClick(e, true)} />
+                    {' '}
+                    <Button text='-' onClick={(e) => handleClick(e, false)} />
                 </div>
                 <input type='submit' value='send proposal' />
             </fieldset>

@@ -103,6 +103,21 @@ a.is-user {
     }
 }
 
+.proposal-details {
+    ul {
+        display: inline-block;
+        background-color: white;
+        margin: $default-margin 0 0 0;
+        padding: $default-padding;
+        border: $default-border;
+        border-radius: $border-radius;
+    }
+
+    li {
+        text-align: right;
+    }
+}
+
 .proposal-extra-information {
     padding: ($default-padding - $small-padding) 0;
 }
@@ -160,6 +175,17 @@ fieldset {
     width: 41ch;
 }
 
+.transfer-input {
+    margin: $default-margin 0;
+    padding: $default-padding;
+    border: $default-border;
+    border-radius: $border-radius;
+
+    &:first-child {
+        margin-top: 0;
+    }
+}
+
 select {
     cursor: pointer;
     background-color: white;
@@ -178,6 +204,10 @@ textarea {
     width: 100%;
     min-height: 10em;
     resize: none;
+}
+
+.ipfs-link {
+    word-break: break-word;
 }
 
 .message-container {

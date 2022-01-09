@@ -28,3 +28,11 @@ export function TezosAddressLink(props) {
         </TzktLink>
     );
 }
+
+export function IpfsLink(props) {
+    return (
+        <Link href={`https://infura-ipfs.io/ipfs/${props.path}`} className={props.className? props.className + ' ipfs-link' : 'ipfs-link'}>
+            {props.children? props.children : props.path}
+        </Link>
+    );
+}

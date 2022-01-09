@@ -4,13 +4,15 @@ import { validateAddress } from '@taquito/utils';
 import { BeaconWallet } from '@taquito/beacon-wallet';
 import { Parser } from '@taquito/michel-codec';
 import axios from 'axios';
+import { create } from 'ipfs-http-client';
+import { getUrlParameter, stringToHex } from '../utils';
 import { ConfirmationMessage } from '../messages';
 
 
 // Define some of the main connection parameters
-const rpcNode = 'https://mainnet.api.tez.ie';
-const network = 'mainnet';
-const multisignContractAddress = 'KT1Cecn3A2A4i9EmSqug45iyzUUQc4F7C9yM';
+const multisignContractAddress = getUrlParameter('contract', 'KT1VphsWVEPiywrGg5xuWDN96dYP1L9KAXuB');
+const network = getUrlParameter('network', 'hangzhounet');
+const rpcNode = `https://${network}.api.tez.ie`;
 
 // Initialize the tezos toolkit
 const tezos = new TezosToolkit(rpcNode);
@@ -283,25 +285,34 @@ export class MultisignContextProvider extends React.Component {
             },
 
             // Creates a transfer mutez proposal
-            createTransferMutezProposal: async (amount, destination) => {
+            createTransferMutezProposal: async (transfers) => {
                 // Return if the multisign contract reference is not available
                 if (!(await this.contractIsAvailable())) return;
 
-                // Check that the amount is smaller thant the contract balance
-                if (amount >= this.state.balance) {
-                    this.state.setErrorMessage('The provided tez amount is larger than the current contract balance');
-                    return;
+                // Loop over the transfers information
+                let totalAmount = 0;
+
+                for (const transfer of transfers) {
+                    // Check that the destination address is a valid address
+                    const destination = transfer.destination;
+
+                    if (!(destination && destination !== '' && validateAddress(destination) === 3)) {
+                        this.state.setErrorMessage(`The provided address is not a valid tezos address: ${destination}`);
+                        return;
+                    }
+
+                    totalAmount += transfer.amount;
                 }
 
-                // Check that the destination address is a valid address
-                if (!(destination && destination !== '' && validateAddress(destination) === 3)) {
-                    this.state.setErrorMessage('The provided address is not a valid tezos address');
+                // Check that the total amount is smaller thant the contract balance
+                if (totalAmount >= this.state.balance) {
+                    this.state.setErrorMessage('The total amount of tez to transfer is larger than the current contract balance');
                     return;
                 }
 
                 // Send the transfer mutez proposal operation
                 console.log('Sending the transfer mutez proposal operation...');
-                const operation = await this.state.contract.methods.transfer_mutez_proposal(amount, destination).send()
+                const operation = await this.state.contract.methods.transfer_mutez_proposal(transfers).send()
                     .catch((error) => console.log('Error while sending the trasfer mutez proposal operation:', error));
 
                 // Wait for the confirmation
@@ -312,25 +323,30 @@ export class MultisignContextProvider extends React.Component {
             },
 
             // Creates a transfer token proposal
-            createTransferTokenProposal: async (tokenContract, tokenId, tokenAmount, destination) => {
+            createTransferTokenProposal: async (tokenContract, tokenId, transfers) => {
                 // Return if the multisign contract reference is not available
                 if (!(await this.contractIsAvailable())) return;
 
                 // Check that the token contract address is a valid address
                 if (!(tokenContract && tokenContract !== '' && validateAddress(tokenContract) === 3)) {
-                    this.state.setErrorMessage('The provided token contract address is not a valid tezos address');
+                    this.state.setErrorMessage(`The provided token contract address is not a valid tezos address: ${tokenContract}`);
                     return;
                 }
 
-                // Check that the destination address is a valid address
-                if (!(destination && destination !== '' && validateAddress(destination) === 3)) {
-                    this.state.setErrorMessage('The provided address is not a valid tezos address');
-                    return;
+                // Loop over the transfers information
+                for (const transfer of transfers) {
+                    // Check that the destination address is a valid address
+                    const destination = transfer.destination;
+
+                    if (!(destination && destination !== '' && validateAddress(destination) === 3)) {
+                        this.state.setErrorMessage(`The provided address is not a valid tezos address: ${destination}`);
+                        return;
+                    }
                 }
 
                 // Send the transfer token proposal operation
                 console.log('Sending the transfer token proposal operation...');
-                const operation = await this.state.contract.methods.transfer_token_proposal(tokenContract, tokenId, tokenAmount, destination).send()
+                const operation = await this.state.contract.methods.transfer_token_proposal(tokenContract, tokenId, transfers).send()
                     .catch((error) => console.log('Error while sending the trasfer token proposal operation:', error));
 
                 // Wait for the confirmation
@@ -462,7 +478,7 @@ export class MultisignContextProvider extends React.Component {
 
                 // Send the lambda function proposal operation
                 console.log('Sending the lambda function proposal operation...');
-                const operation = await this.state.contract.methods.lambda_proposal(lambdaFunction).send()
+                const operation = await this.state.contract.methods.lambda_function_proposal(lambdaFunction).send()
                     .catch((error) => console.log('Error while sending the lambda function proposal operation:', error));
 
                 // Wait for the confirmation
@@ -470,6 +486,55 @@ export class MultisignContextProvider extends React.Component {
 
                 // Update the proposals
                 await this.state.setProposals();
+            },
+
+            // Creates a text proposal
+            createTextProposal: async (ipfsPath) => {
+                // Return if the multisign contract reference is not available
+                if (!(await this.contractIsAvailable())) return;
+
+                // Check that the IPFS path is not undefined
+                if (!ipfsPath) {
+                    this.state.setErrorMessage('The text proposal needs to be uploaded first to IPFS');
+                    return;
+                }
+
+                // Send the text proposal operation
+                console.log('Sending the text proposal operation...');
+                const operation = await this.state.contract.methods.text_proposal(stringToHex('ipfs://' + ipfsPath)).send()
+                    .catch((error) => console.log('Error while sending the text proposal operation:', error));
+
+                // Wait for the confirmation
+                await this.confirmOperation(operation);
+
+                // Update the proposals
+                await this.state.setProposals();
+            },
+
+            // Uploads a file to ipfs and returns the ipfs path
+            uploadToIpfs: async (file) => {
+                // Check that the file is not undefined
+                if (!file) {
+                    this.state.setErrorMessage('A file needs to be loaded before uploading to IPFS');
+                    return;
+                }
+
+                // Create an instance of the IPFS client
+                const client = create('https://ipfs.infura.io:5001/api/v0');
+
+                // Display the confirmation message
+                this.state.setConfirmationMessage(`Uploading ${file.name} to ipfs...`);
+
+                // Upload the file to IPFS
+                console.log(`Uploading ${file.name} to ipfs...`);
+                const added = await client.add(file)
+                    .catch((error) => console.log(`Error while uploading ${file.name} to ipfs:`, error));
+
+                // Remove the confirmation message
+                this.state.setConfirmationMessage(undefined);
+
+                 // Return the IPFS path
+                return added?.path;
             },
         };
     }
