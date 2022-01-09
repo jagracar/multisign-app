@@ -2,7 +2,8 @@
  * General layout
  */
 
-html, body {
+html, body, #root, .app-container {
+    width: 100%;
     height: 100%;
 }
 
@@ -13,37 +14,45 @@ html, body {
 }
 
 // 2nd flexbox group
+.content-container {
+    display: flex;
+    flex-direction: column;
+    gap: $default-gap;
+}
+
+// 3rd flexbox group
 .header-container {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: space-between;
     align-items: flex-start;
-}
-
-// 3rd flexbox group
-.sync-container {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-    align-items: baseline;
-    column-gap: 1em;
+    column-gap: $default-gap;
 }
 
 // 4th flexbox group
+.sync-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: baseline;
+    gap: $small-gap;
+}
+
+// 5th flexbox group
 .users-list {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 0.5em;
+    gap: $small-gap;
 }
 
-// 5th flexbox group
+// 6th flexbox group
 .proposal {
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
     justify-content: flex-start;
     align-items: baseline;
 }
@@ -53,38 +62,43 @@ html, body {
 }
 
 .proposal-description {
-    flex: 1 1 auto;
-    overflow: hidden;
+    flex: 1 1 0;
+    min-width: 20em;
 }
 
 .proposal-extra-information {
     flex: 0 0 auto;
 }
 
-// 6th flexbox group
+// 7th flexbox group
 .proposal-extra-information {
     display: flex;
     flex-direction: row;
-    flex-wrap: wrap;
     justify-content: flex-end;
-    gap: 0.5em;
-}
-
-// 7th flexbox group
-.message-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    gap: $small-gap;
 }
 
 // 8th flexbox group
 fieldset {
     display: flex;
+    flex-direction: row;
     flex-wrap: wrap;
     align-items: baseline;
-    gap: 1em;
+    gap: $default-gap;
 }
 
 .proposal-input {
     flex: 1 1 auto;
+}
+
+// 9th flexbox group
+.message-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width:100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }

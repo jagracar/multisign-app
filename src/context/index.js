@@ -294,7 +294,7 @@ export class MultisignContextProvider extends React.Component {
                 }
 
                 // Check that the destination address is a valid address
-                if (destination && validateAddress(destination) !== 3) {
+                if (!(destination && destination !== '' && validateAddress(destination) === 3)) {
                     this.state.setErrorMessage('The provided address is not a valid tezos address');
                     return;
                 }
@@ -317,13 +317,13 @@ export class MultisignContextProvider extends React.Component {
                 if (!(await this.contractIsAvailable())) return;
 
                 // Check that the token contract address is a valid address
-                if (tokenContract && validateAddress(tokenContract) !== 3) {
+                if (!(tokenContract && tokenContract !== '' && validateAddress(tokenContract) === 3)) {
                     this.state.setErrorMessage('The provided token contract address is not a valid tezos address');
                     return;
                 }
 
                 // Check that the destination address is a valid address
-                if (destination && validateAddress(destination) !== 3) {
+                if (!(destination && destination !== '' && validateAddress(destination) === 3)) {
                     this.state.setErrorMessage('The provided address is not a valid tezos address');
                     return;
                 }
@@ -346,7 +346,7 @@ export class MultisignContextProvider extends React.Component {
                 if (!(await this.contractIsAvailable())) return;
 
                 // Check that the user address is a valid address
-                if (userAddress && validateAddress(userAddress) !== 3) {
+                if (!(userAddress && userAddress !== '' && validateAddress(userAddress) === 3)) {
                     this.state.setErrorMessage('The provided address is not a valid tezos address');
                     return;
                 }
@@ -375,7 +375,7 @@ export class MultisignContextProvider extends React.Component {
                 if (!(await this.contractIsAvailable())) return;
 
                 // Check that the user address is a valid address
-                if (userAddress && validateAddress(userAddress) !== 3) {
+                if (!(userAddress && userAddress !== '' && validateAddress(userAddress) === 3)) {
                     this.state.setErrorMessage('The provided address is not a valid tezos address');
                     return;
                 }

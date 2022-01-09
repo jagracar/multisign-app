@@ -81,6 +81,7 @@ function TransferTezProposalForm(props) {
                 <legend>Transfer tez proposal</legend>
                 <div className='proposal-input'>
                     <label>Amount to transfer (ꜩ):
+                        {' '}
                         <input
                             name='amount'
                             type='number'
@@ -91,6 +92,7 @@ function TransferTezProposalForm(props) {
                     </label>
                     <br />
                     <label>Destination address:
+                        {' '}
                         <input
                             name='destination'
                             type='text'
@@ -140,6 +142,7 @@ function TransferTokenProposalForm(props) {
                 <legend>Transfer token proposal</legend>
                 <div className='proposal-input'>
                     <label>Token contract address:
+                        {' '}
                         <input
                             name='tokenContract'
                             type='text'
@@ -167,6 +170,7 @@ function TransferTokenProposalForm(props) {
                     </label>
                     <br />
                     <label>Token Id:
+                        {' '}
                         <input
                             name='tokenId'
                             type='number'
@@ -177,6 +181,7 @@ function TransferTokenProposalForm(props) {
                     </label>
                     <br />
                     <label>Token editions:
+                        {' '}
                         <input
                             name='tokenAmount'
                             type='number'
@@ -187,6 +192,7 @@ function TransferTokenProposalForm(props) {
                     </label>
                     <br />
                     <label>Destination address:
+                        {' '}
                         <input
                             name='destination'
                             type='text'
@@ -225,6 +231,7 @@ function AddUserProposalForm(props) {
             <fieldset>
                 <legend>Add user proposal</legend>
                 <label className='proposal-input'>User to add:
+                    {' '}
                     <input
                         type='text'
                         spellCheck='false'
@@ -261,6 +268,7 @@ function RemoveUserProposalForm(props) {
             <fieldset>
                 <legend>Remove user proposal</legend>
                 <label className='proposal-input'>User to remove:
+                    {' '}
                     <select value={user} onChange={handleChange}>
                         {props.users.map((userWallet) => (
                             <option key={userWallet} value={userWallet}>
@@ -295,6 +303,7 @@ function MinimumVotesProposalForm(props) {
             <fieldset>
                 <legend>Minimum votes proposal</legend>
                 <label className='proposal-input'>New minimum votes:
+                    {' '}
                     <input
                         type='number'
                         min='1'
@@ -328,6 +337,7 @@ function ExpirationTimeProposalForm(props) {
             <fieldset>
                 <legend>Expiration time proposal</legend>
                 <label className='proposal-input'>New expiration time (days):
+                    {' '}
                     <input
                         type='number'
                         min='1'
@@ -362,7 +372,9 @@ function LambdaFunctionProposalForm(props) {
             <fieldset>
                 <legend>Lambda function proposal</legend>
                 <label className='proposal-input'>Lambda function code in Micheline format:
+                    {' '}
                     <textarea
+                        className='micheline-code'
                         spellCheck='false'
                         value={michelineCode}
                         onChange={handleChange}

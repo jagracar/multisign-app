@@ -7,12 +7,29 @@ $L: 1440px; // 90em for 16px body font
 $general-text-color: lighten(black, 20%);
 $header-color: lighten(black, 40%);
 $link-color: lighten(blue, 20%);
+$footer-background-color: darken(white, 2%);
 $section-background-color: darken(white, 2%);
 $button-background-color: darken(white, 6%);
-$is-user-background-color: lighten(green, 60%);
 $button-hover-background-color: darken(white, 10%);
+$is-user-background-color: lighten(green, 60%);
 $is-user-hover-background-color: lighten(green, 50%);
-$border-color: darken(white, 30%);
+$vote-background-color: white;
 $yes-vote-background-color: lighten(green, 60%);
 $no-vote-background-color: lighten(red, 30%);
-$error-message-background-color: rgba(0, 0, 0, 0.5);
+$message-background-color: rgba(0, 0, 0, 0.5);
+
+// Length variables
+$small-gap: 0.5em;
+$default-gap: 1em;
+$small-padding: 0.5em;
+$default-padding: 1em;
+$big-padding: 2em;
+$small-margin: 0.5em;
+$default-margin: 1em;
+$big-margin: 2em;
+$border-radius: 4px;
+$big-border-radius: 10px;
+$monospace-font-size: 1.1em;
+
+// Complex variables
+$default-border: 1px solid darken(white, 30%);
