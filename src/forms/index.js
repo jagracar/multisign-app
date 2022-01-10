@@ -5,112 +5,140 @@ import { IpfsLink } from '../link';
 import { ErrorMessage } from '../messages';
 
 
-export function CreateProposalForms(props) {
+export function ContractSelectionForm() {
     // Get the multisign context
     const context = useContext(MultisignContext);
 
-    // Return if the user is not connected or is not one of the multisign users
-    if (!(context.activeAccount && context.storage?.users.includes(context.activeAccount.address))) {
-        return null;
-    }
+    // Set the component state
+    const [contractAddress, setContractAddress] = useState(context.contractAddress);
+
+    // Define the on submit handler
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        await context.setContractAddress(contractAddress);
+     };
 
     return (
-        <section>
-            <h2>Create new proposals</h2>
-
+        <>
             {context.errorMessage &&
                 <ErrorMessage message={context.errorMessage} onClick={() => context.setErrorMessage(undefined)} />
             }
 
-            <TextProposalForm
-                uploadToIpfs={context.uploadToIpfs}
-                handleSubmit={context.createTextProposal}
-            />
-
-            <TransferTezProposalForm
-                handleSubmit={context.createTransferMutezProposal}
-            />
-
-            <TransferTokenProposalForm
-                handleSubmit={context.createTransferTokenProposal}
-            />
-
-            <AddUserProposalForm
-                handleSubmit={context.createAddUserProposal}
-            />
-
-            <RemoveUserProposalForm
-                users={context.storage.users}
-                handleSubmit={context.createRemoveUserProposal}
-            />
-
-            <MinimumVotesProposalForm
-                defaultValue={context.storage.minimum_votes}
-                handleSubmit={context.createMinimumVotesProposal}
-            />
-
-            <ExpirationTimeProposalForm
-                defaultValue={context.storage.expiration_time}
-                handleSubmit={context.createExpirationTimeProposal}
-            />
-
-            <LambdaFunctionProposalForm
-                handleSubmit={context.createLambdaFunctionProposal}
-            />
-        </section>
+            <section>
+                <form onSubmit={handleSubmit}>
+                    <label className='form-input'>Select multisign:
+                        {' '}
+                        <input
+                            type='text'
+                            list='multisignContracts'
+                            spellCheck='false'
+                            minLength='36'
+                            maxLength='36'
+                            className='contract-address-input'
+                            value={contractAddress}
+                            onMouseDown={() => setContractAddress('')}
+                            onChange={(e) => setContractAddress(e.target.value)}
+                        />
+                        <datalist id='multisignContracts'>
+                            <option value=''></option>
+                            <option value='KT1VphsWVEPiywrGg5xuWDN96dYP1L9KAXuB'>test multising 1</option>
+                        </datalist>
+                    </label>
+                    <input type='submit' value='load' />
+                </form>
+            </section>
+        </>
     );
 }
 
-function TextProposalForm(props) {
-    // Set the component state
-    const [file, setFile] = useState(undefined);
-    const [ipfsPath, setIpfsPath] = useState(undefined);
+export function CreateProposalForms() {
+    // Get the multisign context
+    const context = useContext(MultisignContext);
 
-    // Define the on change handler
-    const handleChange = (e) => {
-        setFile(e.target.files[0]);
-        setIpfsPath(undefined);
-    };
+    // Return if the user is not connected
+    if (!context.activeAccount) {
+        return (
+            <section>
+                <p>You need to sync your wallet to be able to create proposal.</p>
+            </section>
+        );
+    }
 
-    // Define the on click handler
-    const handleClick = async (e) => {
-        e.preventDefault();
-
-        // Update the component state
-        setIpfsPath(await props.uploadToIpfs(file));
-    };
-
-    // Define the on submit handler
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        props.handleSubmit(ipfsPath);
-    };
+    // Return if the user is not one of the multisign users
+    if (!(context.storage && context.storage.users.includes(context.activeAccount.address))) {
+        return (
+            <section>
+                <p>Only multisign users can create new proposals.</p>
+            </section>
+        );
+    }
 
     return (
-        <form onSubmit={handleSubmit}>
-            <fieldset>
-                <legend>Text proposal</legend>
-                <div className='proposal-input'>
-                    <label>File with the text to approve:
-                        {' '}
-                        <input
-                            type='file'
-                            onChange={handleChange}
-                        />
-                    </label>
-                    {file &&
-                        <div>
-                            <Button text={ipfsPath? 'uploaded' : 'upload to IPFS'} onClick={handleClick} />
-                            {' '}
-                            {ipfsPath &&
-                                <IpfsLink path={ipfsPath} />
-                            }
-                        </div>
-                    }
-                </div>
-                <input type='submit' value='send proposal' />
-            </fieldset>
-        </form>
+        <>
+            {context.errorMessage &&
+                <ErrorMessage message={context.errorMessage} onClick={() => context.setErrorMessage(undefined)} />
+            }
+
+            <section>
+                <h2>Transfer tez proposal</h2>
+                <TransferTezProposalForm
+                    handleSubmit={context.createTransferMutezProposal}
+                />
+            </section>
+
+            <section>
+                <h2>Transfer token proposal</h2>
+                <TransferTokenProposalForm
+                    handleSubmit={context.createTransferTokenProposal}
+                />
+            </section>
+
+            <section>
+                <h2>Text proposal</h2>
+                <TextProposalForm
+                    uploadToIpfs={context.uploadToIpfs}
+                    handleSubmit={context.createTextProposal}
+                />
+            </section>
+
+            <section>
+                <h2>Lambda function proposal</h2>
+                <LambdaFunctionProposalForm
+                    handleSubmit={context.createLambdaFunctionProposal}
+                />
+            </section>
+
+            <section>
+                <h2>Add user proposal</h2>
+                <AddUserProposalForm
+                    handleSubmit={context.createAddUserProposal}
+                />
+            </section>
+
+            <section>
+                <h2>Remove user proposal</h2>
+                <RemoveUserProposalForm
+                    users={context.storage.users}
+                    handleSubmit={context.createRemoveUserProposal}
+                />
+            </section>
+
+            <section>
+                <h2>Minimum votes proposal</h2>
+                <MinimumVotesProposalForm
+                    defaultValue={context.storage.minimum_votes}
+                    handleSubmit={context.createMinimumVotesProposal}
+                />
+            </section>
+
+            <section>
+                <h2>Expiration time proposal</h2>
+                <ExpirationTimeProposalForm
+                    defaultValue={context.storage.expiration_time}
+                    handleSubmit={context.createExpirationTimeProposal}
+                />
+            </section>
+        </>
     );
 }
 
@@ -175,9 +203,8 @@ function TransferTezProposalForm(props) {
 
     return (
         <form onSubmit={handleSubmit}>
-            <fieldset>
-                <legend>Transfer tez proposal</legend>
-                <div className='proposal-input'>
+            <div className='form-input'>
+                <div className='transfers-input'>
                     {transfers.map((transfer, index) => (
                         <div key={index}  className='transfer-input'>
                             <label>Amount to transfer (ꜩ):
@@ -205,12 +232,12 @@ function TransferTezProposalForm(props) {
                             </label>
                         </div>
                     ))}
-                    <Button text='+' onClick={(e) => handleClick(e, true)} />
-                    {' '}
-                    <Button text='-' onClick={(e) => handleClick(e, false)} />
                 </div>
-                <input type='submit' value='send proposal' />
-            </fieldset>
+                <Button text='+' onClick={(e) => handleClick(e, true)} />
+                {' '}
+                <Button text='-' onClick={(e) => handleClick(e, false)} />
+            </div>
+            <input type='submit' value='send proposal' />
         </form>
     );
 }
@@ -273,46 +300,46 @@ function TransferTokenProposalForm(props) {
 
     return (
         <form onSubmit={handleSubmit}>
-            <fieldset>
-                <legend>Transfer token proposal</legend>
-                <div className='proposal-input'>
-                    <label>Token contract address:
-                        {' '}
-                        <input
-                            type='text'
-                            list='tokenContracts'
-                            spellCheck='false'
-                            minLength='36'
-                            maxLength='36'
-                            className='token-contract-input'
-                            value={tokenContract}
-                            onChange={(e) => setTokenContract(e.target.value)}
-                            onMouseDown={() => setTokenContract('')}
-                        />
-                        <datalist id='tokenContracts'>
-                            <option value=''></option>
-                            <option value='KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton'>OBJKT</option>
-                            <option value='KT1AFA2mwNUMNd4SsujE1YYp29vd8BZejyKW'>hDAO</option>
-                            <option value='KT1LHHLso8zQWQWg1HUukajdxxbkGfNoHjh6'>Tezzardz</option>
-                            <option value='KT1VbHpQmtkA3D4uEbbju26zS8C42M5AGNjZ'>PRJKTNEON</option>
-                            <option value='KT1LbLNTTPoLgpumACCBFJzBEHDiEUqNxz5C'>Art Cardz</option>
-                            <option value='KT1SyPgtiXTaEfBuMZKviWGNHqVrBBEjvtfQ'>GOGOs</option>
-                            <option value='KT1MsdyBSAMQwzvDH4jt2mxUKJvBSWZuPoRJ'>NEONZ</option>
-                            <option value='KT1HZVd9Cjc2CMe3sQvXgbxhpJkdena21pih'>Randomly Common Skeles</option>
-                            <option value='KT1PNcZQkJXMQ2Mg92HG1kyrcu3auFX5pfd8'>ZIGGURATS</option>
-                        </datalist>
-                    </label>
-                    <br />
-                    <label>Token Id:
-                        {' '}
-                        <input
-                            type='number'
-                            min='0'
-                            step='1'
-                            value={tokenId}
-                            onChange={(e) => setTokenId(e.target.value)} />
-                    </label>
-                    <br />
+            <div className='form-input'>
+                <label>Token contract address:
+                    {' '}
+                    <input
+                        type='text'
+                        list='tokenContracts'
+                        spellCheck='false'
+                        minLength='36'
+                        maxLength='36'
+                        className='contract-address-input'
+                        value={tokenContract}
+                        onMouseDown={() => setTokenContract('')}
+                        onChange={(e) => setTokenContract(e.target.value)}
+                    />
+                    <datalist id='tokenContracts'>
+                        <option value=''></option>
+                        <option value='KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton'>OBJKT</option>
+                        <option value='KT1AFA2mwNUMNd4SsujE1YYp29vd8BZejyKW'>hDAO</option>
+                        <option value='KT1LHHLso8zQWQWg1HUukajdxxbkGfNoHjh6'>Tezzardz</option>
+                        <option value='KT1VbHpQmtkA3D4uEbbju26zS8C42M5AGNjZ'>PRJKTNEON</option>
+                        <option value='KT1LbLNTTPoLgpumACCBFJzBEHDiEUqNxz5C'>Art Cardz</option>
+                        <option value='KT1SyPgtiXTaEfBuMZKviWGNHqVrBBEjvtfQ'>GOGOs</option>
+                        <option value='KT1MsdyBSAMQwzvDH4jt2mxUKJvBSWZuPoRJ'>NEONZ</option>
+                        <option value='KT1HZVd9Cjc2CMe3sQvXgbxhpJkdena21pih'>Randomly Common Skeles</option>
+                        <option value='KT1PNcZQkJXMQ2Mg92HG1kyrcu3auFX5pfd8'>ZIGGURATS</option>
+                    </datalist>
+                </label>
+                <br />
+                <label>Token Id:
+                    {' '}
+                    <input
+                        type='number'
+                        min='0'
+                        step='1'
+                        value={tokenId}
+                        onChange={(e) => setTokenId(e.target.value)}
+                    />
+                </label>
+                <br />
+                <div className='transfers-input'>
                     {transfers.map((transfer, index) => (
                         <div key={index}  className='transfer-input'>
                             <label>Token editions:
@@ -340,153 +367,62 @@ function TransferTokenProposalForm(props) {
                             </label>
                         </div>
                     ))}
-                    <Button text='+' onClick={(e) => handleClick(e, true)} />
-                    {' '}
-                    <Button text='-' onClick={(e) => handleClick(e, false)} />
                 </div>
-                <input type='submit' value='send proposal' />
-            </fieldset>
+                <Button text='+' onClick={(e) => handleClick(e, true)} />
+                {' '}
+                <Button text='-' onClick={(e) => handleClick(e, false)} />
+            </div>
+            <input type='submit' value='send proposal' />
         </form>
     );
 }
 
-function AddUserProposalForm(props) {
+function TextProposalForm(props) {
     // Set the component state
-    const [user, setUser] = useState('');
+    const [file, setFile] = useState(undefined);
+    const [ipfsPath, setIpfsPath] = useState(undefined);
 
     // Define the on change handler
     const handleChange = (e) => {
-        setUser(e.target.value);
+        setFile(e.target.files[0]);
+        setIpfsPath(undefined);
+    };
+
+    // Define the on click handler
+    const handleClick = async (e) => {
+        e.preventDefault();
+
+        // Update the component state
+        setIpfsPath(await props.uploadToIpfs(file));
     };
 
     // Define the on submit handler
     const handleSubmit = (e) => {
         e.preventDefault();
-        props.handleSubmit(user);
+        props.handleSubmit(ipfsPath);
     };
 
     return (
         <form onSubmit={handleSubmit}>
-            <fieldset>
-                <legend>Add user proposal</legend>
-                <label className='proposal-input'>User to add:
+            <div className='form-input'>
+                <label>File with the text to approve:
                     {' '}
                     <input
-                        type='text'
-                        spellCheck='false'
-                        minLength='36'
-                        maxLength='36'
-                        className='tezos-wallet-input'
-                        value={user}
+                        type='file'
                         onChange={handleChange}
                     />
                 </label>
-                <input type='submit' value='send proposal' />
-            </fieldset>
-        </form>
-    );
-}
-
-function RemoveUserProposalForm(props) {
-    // Set the component state
-    const [user, setUser] = useState(props.users[0]);
-
-    // Define the on change handler
-    const handleChange = (e) => {
-        setUser(e.target.value);
-    };
-
-    // Define the on submit handler
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        props.handleSubmit(user);
-    };
-
-    return (
-        <form onSubmit={handleSubmit}>
-            <fieldset>
-                <legend>Remove user proposal</legend>
-                <label className='proposal-input'>User to remove:
-                    {' '}
-                    <select value={user} onChange={handleChange}>
-                        {props.users.map((userWallet) => (
-                            <option key={userWallet} value={userWallet}>
-                                {userWallet}
-                            </option>
-                        ))}
-                    </select>
-                </label>
-                <input type='submit' value='send proposal' />
-            </fieldset>
-        </form>
-    );
-}
-
-function MinimumVotesProposalForm(props) {
-    // Set the component state
-    const [minimumVotes, setMinimumVotes] = useState(props.defaultValue);
-
-    // Define the on change handler
-    const handleChange = (e) => {
-        setMinimumVotes(Math.round(e.target.value));
-    };
-
-    // Define the on submit handler
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        props.handleSubmit(minimumVotes);
-    };
-
-    return (
-        <form onSubmit={handleSubmit}>
-            <fieldset>
-                <legend>Minimum votes proposal</legend>
-                <label className='proposal-input'>New minimum votes:
-                    {' '}
-                    <input
-                        type='number'
-                        min='1'
-                        step='1'
-                        value={minimumVotes}
-                        onChange={handleChange} />
-                </label>
-                <input type='submit' value='send proposal' />
-            </fieldset>
-        </form>
-    );
-}
-
-function ExpirationTimeProposalForm(props) {
-    // Set the component state
-    const [expirationTime, setExpirationTime] = useState(props.defaultValue);
-
-    // Define the on change handler
-    const handleChange = (e) => {
-        setExpirationTime(Math.round(e.target.value));
-    };
-
-    // Define the on submit handler
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        props.handleSubmit(expirationTime);
-    };
-
-    return (
-        <form onSubmit={handleSubmit}>
-            <fieldset>
-                <legend>Expiration time proposal</legend>
-                <label className='proposal-input'>New expiration time (days):
-                    {' '}
-                    <input
-                        type='number'
-                        min='1'
-                        step='1'
-                        value={expirationTime}
-                        onChange={handleChange}
-                    />
-                </label>
-                <input type='submit' value='send proposal' />
-            </fieldset>
+                {file &&
+                    <div>
+                        <Button text={ipfsPath? 'uploaded' : 'upload to IPFS'} onClick={handleClick} />
+                        {' '}
+                        {ipfsPath &&
+                            <IpfsLink path={ipfsPath} />
+                        }
+                    </div>
+                }
+            </div>
+            <input type='submit' value='send proposal' />
         </form>
     );
 }
@@ -508,19 +444,146 @@ function LambdaFunctionProposalForm(props) {
 
     return (
         <form onSubmit={handleSubmit}>
-            <fieldset>
-                <legend>Lambda function proposal</legend>
-                <label className='proposal-input'>Lambda function code in Micheline format:
-                    {' '}
-                    <textarea
-                        className='micheline-code'
-                        spellCheck='false'
-                        value={michelineCode}
-                        onChange={handleChange}
-                    />
-                </label>
-                <input type='submit' value='send proposal' />
-            </fieldset>
+            <label className='form-input'>Lambda function code in Micheline format:
+                {' '}
+                <textarea
+                    className='micheline-code'
+                    spellCheck='false'
+                    value={michelineCode}
+                    onChange={handleChange}
+                />
+            </label>
+            <input type='submit' value='send proposal' />
+        </form>
+    );
+}
+
+function AddUserProposalForm(props) {
+    // Set the component state
+    const [user, setUser] = useState('');
+
+    // Define the on change handler
+    const handleChange = (e) => {
+        setUser(e.target.value);
+    };
+
+    // Define the on submit handler
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        props.handleSubmit(user);
+    };
+
+    return (
+        <form onSubmit={handleSubmit}>
+            <label className='form-input'>User to add:
+                {' '}
+                <input
+                    type='text'
+                    spellCheck='false'
+                    minLength='36'
+                    maxLength='36'
+                    className='tezos-wallet-input'
+                    value={user}
+                    onChange={handleChange}
+                />
+            </label>
+            <input type='submit' value='send proposal' />
+        </form>
+    );
+}
+
+function RemoveUserProposalForm(props) {
+    // Set the component state
+    const [user, setUser] = useState(props.users[0]);
+
+    // Define the on change handler
+    const handleChange = (e) => {
+        setUser(e.target.value);
+    };
+
+    // Define the on submit handler
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        props.handleSubmit(user);
+    };
+
+    return (
+        <form onSubmit={handleSubmit}>
+            <label className='form-input'>User to remove:
+                {' '}
+                <select value={user} onChange={handleChange}>
+                    {props.users.map((userWallet, index) => (
+                        <option key={index} value={userWallet}>
+                            {userWallet}
+                        </option>
+                    ))}
+                </select>
+            </label>
+            <input type='submit' value='send proposal' />
+        </form>
+    );
+}
+
+function MinimumVotesProposalForm(props) {
+    // Set the component state
+    const [minimumVotes, setMinimumVotes] = useState(props.defaultValue);
+
+    // Define the on change handler
+    const handleChange = (e) => {
+        setMinimumVotes(Math.round(e.target.value));
+    };
+
+    // Define the on submit handler
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        props.handleSubmit(minimumVotes);
+    };
+
+    return (
+        <form onSubmit={handleSubmit}>
+            <label className='form-input'>New minimum votes:
+                {' '}
+                <input
+                    type='number'
+                    min='1'
+                    step='1'
+                    value={minimumVotes}
+                    onChange={handleChange}
+                />
+            </label>
+            <input type='submit' value='send proposal' />
+        </form>
+    );
+}
+
+function ExpirationTimeProposalForm(props) {
+    // Set the component state
+    const [expirationTime, setExpirationTime] = useState(props.defaultValue);
+
+    // Define the on change handler
+    const handleChange = (e) => {
+        setExpirationTime(Math.round(e.target.value));
+    };
+
+    // Define the on submit handler
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        props.handleSubmit(expirationTime);
+    };
+
+    return (
+        <form onSubmit={handleSubmit}>
+            <label className='form-input'>New expiration time (days):
+                {' '}
+                <input
+                    type='number'
+                    min='1'
+                    step='1'
+                    value={expirationTime}
+                    onChange={handleChange}
+                />
+            </label>
+            <input type='submit' value='send proposal' />
         </form>
     );
 }

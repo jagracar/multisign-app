@@ -45,18 +45,22 @@ export function Proposals() {
     }
 
     return (
-        <section>
-            <h2>Proposals</h2>
+        <>
+            <section>
+                <h2>Active proposals</h2>
+                <ProposalList proposals={activeProposals} canVote={context.storage?.users.includes(context.activeAccount?.address)} />
+            </section>
 
-            <h3>Active proposals</h3>
-            <ProposalList proposals={activeProposals} canVote={context.storage?.users.includes(context.activeAccount?.address)} />
+            <section>
+                <h2>Executed proposals</h2>
+                <ProposalList proposals={executedProposals} />
+            </section>
 
-            <h3>Executed proposals</h3>
-            <ProposalList proposals={executedProposals} />
-
-            <h3>Expired proposals</h3>
-            <ProposalList proposals={expiredProposals} />
-        </section>
+            <section>
+                <h2>Expired proposals</h2>
+                <ProposalList proposals={expiredProposals} />
+            </section>
+        </>
     );
 }
 
@@ -70,7 +74,7 @@ function ProposalList(props) {
     return (
         <ul className='proposal-list'>
             {props.proposals.map((proposal) => (
-                <li key={proposal.key} className='proposal'>
+                <li key={proposal.key}>
                     <Proposal
                         proposalId={proposal.key}
                         proposal={proposal.value}
@@ -86,7 +90,7 @@ function ProposalList(props) {
 
 function Proposal(props) {
     return (
-        <>
+        <div className='proposal'>
             <ProposalTimestamp timestamp={props.proposal.timestamp} />
             <ProposalDescription proposal={props.proposal} />
             <ProposalExtraInformation
@@ -96,7 +100,7 @@ function Proposal(props) {
                 voteProposal={props.voteProposal}
                 executeProposal={props.executeProposal}
             />
-        </>
+        </div>
     );
 }
 
@@ -113,7 +117,6 @@ function ProposalDescription(props) {
     const issuer = proposal.issuer;
 
     if (kind.hasOwnProperty('text')) {
-        console.log(proposal.text)
         return (
             <p className='proposal-description'>
                 <TezosAddressLink address={issuer} shorten /> proposed to approve a
@@ -145,7 +148,7 @@ function ProposalDescription(props) {
                     <p>
                         <TezosAddressLink address={issuer} shorten /> proposed to transfer {totalAmount / 1000000} ꜩ.
                     </p>
-                    <details className='proposal-details'>
+                    <details>
                         <summary>See transfer details</summary>
                         <ul>
                             {transfers.map((transfer, index) => (
@@ -190,7 +193,7 @@ function ProposalDescription(props) {
                         {' '}
                         <TzktLink address={fa2} className='tezos-address'>#{tokenId}</TzktLink>.
                     </p>
-                    <details className='proposal-details'>
+                    <details>
                         <summary>See transfer details</summary>
                         <ul>
                             {transfers.map((transfer, index) => (
@@ -260,8 +263,7 @@ function ProposalDescription(props) {
         return (
             <div className='proposal-description'>
                 <p><TezosAddressLink address={issuer} shorten /> proposed to execute a lambda function.</p>
-
-                <details className='proposal-details'>
+                <details>
                     <summary>See Micheline code</summary>
                     <pre className='micheline-code'>
                         {encodedMichelineCode}

@@ -2,35 +2,26 @@
  * General layout
  */
 
-html, body, #root, .app-container {
-    width: 100%;
-    height: 100%;
-}
-
 // 1st flexbox group
 .app-container {
     display: flex;
     flex-direction: column;
 }
 
-// 2nd flexbox group
-.content-container {
-    display: flex;
-    flex-direction: column;
-    gap: $default-gap;
+main {
+    flex: 1 1 auto;
 }
 
-// 3rd flexbox group
+// 2nd flexbox group
 .header-container {
     display: flex;
     flex-direction: row;
-    flex-wrap: wrap;
     justify-content: space-between;
-    align-items: flex-start;
-    column-gap: $default-gap;
+    align-items: baseline;
+    row-gap: $default-gap;
 }
 
-// 4th flexbox group
+// 3rd flexbox group
 .sync-container {
     display: flex;
     flex-direction: row;
@@ -39,7 +30,7 @@ html, body, #root, .app-container {
     gap: $small-gap;
 }
 
-// 5th flexbox group
+// 4th flexbox group
 .users-list {
     display: flex;
     flex-direction: row;
@@ -48,17 +39,12 @@ html, body, #root, .app-container {
     gap: $small-gap;
 }
 
-// 6th flexbox group
+// 5th flexbox group
 .proposal {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    justify-content: flex-start;
     align-items: baseline;
-}
-
-.proposal-timestamp {
-    flex: 0 0 auto;
 }
 
 .proposal-description {
@@ -66,32 +52,27 @@ html, body, #root, .app-container {
     min-width: 20em;
 }
 
-.proposal-extra-information {
-    flex: 0 0 auto;
-}
-
-// 7th flexbox group
+// 6th flexbox group
 .proposal-extra-information {
     display: flex;
     flex-direction: row;
-    justify-content: flex-end;
     gap: $small-gap;
 }
 
-// 8th flexbox group
-fieldset {
+// 7th flexbox group
+form {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     align-items: baseline;
-    gap: $default-gap;
+    column-gap: $default-gap;
 }
 
-.proposal-input {
+.form-input {
     flex: 1 1 auto;
 }
 
-// 9th flexbox group
+// 8th flexbox group
 .message-container {
     position: fixed;
     top: 0;

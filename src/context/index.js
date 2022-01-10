@@ -5,13 +5,13 @@ import { BeaconWallet } from '@taquito/beacon-wallet';
 import { Parser } from '@taquito/michel-codec';
 import axios from 'axios';
 import { create } from 'ipfs-http-client';
-import { getUrlParameter, stringToHex } from '../utils';
+import { stringToHex } from '../utils';
 import { ConfirmationMessage } from '../messages';
 
 
 // Define some of the main connection parameters
-const multisignContractAddress = getUrlParameter('contract', 'KT1VphsWVEPiywrGg5xuWDN96dYP1L9KAXuB');
-const network = getUrlParameter('network', 'hangzhounet');
+const multisignContractAddress = 'KT1VphsWVEPiywrGg5xuWDN96dYP1L9KAXuB';
+const network = 'hangzhounet';
 const rpcNode = `https://${network}.api.tez.ie`;
 
 // Initialize the tezos toolkit
@@ -149,6 +149,31 @@ export class MultisignContextProvider extends React.Component {
 
             // The multisign contract address
             contractAddress: multisignContractAddress,
+
+            // Sets the multisign contract address
+            setContractAddress: async (contractAddress) => {
+                // Return if the contract address is not a proper address
+                if (!(contractAddress && contractAddress !== '' && validateAddress(contractAddress) === 3)) {
+                    this.state.setErrorMessage(`The provided address is not a valid contract address: ${contractAddress}`);
+                    return;
+                }
+
+                // Update the contract address and reset other contract variables
+                this.setState({
+                    contractAddress: contractAddress,
+                    contract: undefined,
+                    balance: undefined,
+                    storage: undefined,
+                    proposals: undefined,
+                    userVotes: undefined
+                })
+
+                // Update all the multisign data
+                await this.state.setBalance();
+                await this.state.setStorage();
+                await this.state.setProposals();
+                await this.state.setUserVotes();
+            },
 
             // The current active account
             activeAccount: undefined,
