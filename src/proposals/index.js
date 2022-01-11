@@ -130,9 +130,7 @@ function ProposalDescription(props) {
         // Extract the transfers information
         const transfers = proposal.mutez_transfers;
         const nTransfers = transfers.length;
-        const totalAmount = transfers.reduce((current, previous) =>
-            parseInt(previous.amount) + parseInt(current.amount)
-        );
+        const totalAmount = transfers.reduce((previous, current) => previous + parseInt(current.amount), 0);
 
         if (nTransfers === 1) {
             return (
@@ -169,9 +167,7 @@ function ProposalDescription(props) {
         const tokenId = proposal.token_transfers.token_id;
         const transfers = proposal.token_transfers.distribution;
         const nTransfers = transfers.length;
-        const nEditions = transfers.reduce((current, previous) =>
-            parseInt(previous.amount) + parseInt(current.amount)
-        );
+        const nEditions = transfers.reduce((previous, current) => previous + parseInt(current.amount), 0);
 
         if (nTransfers === 1) {
             return (
