@@ -20,17 +20,15 @@ nav {
         display: inline-block;
         margin-right: $default-margin;
         list-style-type: none;
-
-        &:hover {
-            border-bottom: $default-border;
-        }
     }
 
     a {
         color: $header-color;
+        padding-bottom: $small-padding;
 
-        &:hover, &:focus {
+        &:hover, &:focus, &.active {
             text-decoration: none;
+            border-bottom: $default-border;
         }
     }
 }

@@ -1,5 +1,5 @@
 import React, { createContext } from 'react';
-import { TezosToolkit } from '@taquito/taquito';
+import { TezosToolkit, MichelsonMap } from '@taquito/taquito';
 import { validateAddress } from '@taquito/utils';
 import { BeaconWallet } from '@taquito/beacon-wallet';
 import { Parser } from '@taquito/michel-codec';
@@ -8,10 +8,12 @@ import { create } from 'ipfs-http-client';
 import { stringToHex } from '../utils';
 import { ConfirmationMessage } from '../messages';
 
+// Load the multisign smart contrac code in JSON format
+const multisigContractJsonFile = require('../contract/multisignContract.json');
 
 // Define some of the main connection parameters
-const multisignContractAddress = 'KT1VphsWVEPiywrGg5xuWDN96dYP1L9KAXuB';
-const network = 'hangzhounet';
+const multisignContractAddress = 'KT1RtYAfoiFNkgZxQJmkSAEyQitfEQHyX3Cb';
+const network = 'mainnet';
 const rpcNode = `https://${network}.api.tez.ie`;
 
 // Initialize the tezos toolkit
@@ -140,6 +142,18 @@ export class MultisignContextProvider extends React.Component {
 
             // Remove the confirmation message
             this.state.setConfirmationMessage(undefined);
+        };
+
+        // Originates a contract with the provided storage
+        this.originateContract = async (contract, storage) => {
+            console.log('Originating contract...');
+            return await tezos.wallet.originate({code: contract, storage: storage}).send()
+                .then((originationOp) => {
+                    console.log('Waiting for confirmation of origination...');
+                    return originationOp.contract();
+                })
+                .then((contract) => console.log(`Origination completed for ${contract.address}.`))
+                .catch((error) => console.log('Error while originating the contract:', error));
         };
 
         // Define the component state parameters
@@ -560,6 +574,30 @@ export class MultisignContextProvider extends React.Component {
 
                  // Return the IPFS path
                 return added?.path;
+            },
+
+            // Originates a new multisign smart contract
+            originate: async () => {
+                const metadataBigmap = new MichelsonMap();
+                const proposalsBigmap = new MichelsonMap();
+                const votesBigmap = new MichelsonMap();
+
+                metadataBigmap.set('', '697066733a2f2f516d52566b6f7053715a4c784d594b5a784e6b5a72703467385a365968706a456f6278594c544d6d4c4275795237');
+
+                const storage = {
+                    counter: 0,
+                    expiration_time: 5,
+                    metadata: metadataBigmap,
+                    minimum_votes: 4,
+                    proposals: proposalsBigmap,
+                    users: [
+                        'tz1gnL9CeM5h5kRzWZztFYLypCNnVQZjndBN',
+                        'tz1h9TG6uuxv2FtmE5yqMyKQqx8hkXk7NY6c'
+                    ],
+                    votes: votesBigmap
+                }
+
+                this.originateContract(multisigContractJsonFile, storage);
             },
         };
     }

@@ -11,7 +11,7 @@ ReactDOM.render(
         <BrowserRouter>
             <Routes>
                 <Route path='/' element={<App />}>
-                    <Route path='' element={<MultisignParameters />} />
+                    <Route index element={<MultisignParameters />} />
                     <Route path='proposals' element={<MultisignProposals />} />
                     <Route path='create' element={<CreateProposals />} />
                     <Route path='*' element={<NotFound />} />

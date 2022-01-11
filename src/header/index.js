@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import { MultisignContext } from '../context';
 import { TezosAddressLink } from '../link';
 import { Button } from '../button';
@@ -19,13 +19,13 @@ export function Navigation() {
         <nav>
             <ul>
                 <li>
-                    <Link to='/'>Multisign</Link>
+                    <NavLink to='/'>Multisign</NavLink>
                 </li>
                 <li>
-                    <Link to='/proposals'>Proposals</Link>
+                    <NavLink to='/proposals'>Proposals</NavLink>
                 </li>
                 <li>
-                    <Link to='/create'>Create proposals</Link>
+                    <NavLink to='/create'>Create proposals</NavLink>
                 </li>
             </ul>
         </nav>

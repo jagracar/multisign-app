@@ -26,7 +26,7 @@ export function Parameters() {
                 <li>Contract address: <TezosAddressLink address={context.contractAddress} /></li>
                 <li>Positive votes needed to execute a proposal: {context.storage?.minimum_votes} votes</li>
                 <li>Proposal expiration time: {context.storage?.expiration_time} days</li>
-                <li>Balance: {context.balance? context.balance / 1000000 : ''} ꜩ</li>
+                <li>Balance: {context.balance? context.balance / 1000000 : '0'} ꜩ</li>
             </ul>
         </section>
     );

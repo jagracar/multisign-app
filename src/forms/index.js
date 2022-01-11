@@ -41,7 +41,7 @@ export function ContractSelectionForm() {
                         />
                         <datalist id='multisignContracts'>
                             <option value=''></option>
-                            <option value='KT1VphsWVEPiywrGg5xuWDN96dYP1L9KAXuB'>test multising 1</option>
+                            <option value='KT1RtYAfoiFNkgZxQJmkSAEyQitfEQHyX3Cb'>test multising 1</option>
                         </datalist>
                     </label>
                     <input type='submit' value='load' />
