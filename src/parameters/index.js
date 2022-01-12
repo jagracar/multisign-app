@@ -17,7 +17,8 @@ export function Parameters() {
                             <li key={index}>
                                 <TezosAddressLink
                                     address={user}
-                                    isUser={user === context.activeAccount?.address}
+                                    className={user === context.activeAccount?.address && 'is-user'}
+                                    useAlias
                                 />
                             </li>
                         ))}

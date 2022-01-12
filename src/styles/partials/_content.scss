@@ -18,17 +18,26 @@ nav {
 
     li {
         display: inline-block;
-        margin-right: $default-margin;
+        margin: 0 $default-margin $default-margin 0;
         list-style-type: none;
     }
 
     a {
         color: $header-color;
-        padding-bottom: $small-padding;
+        padding: $small-padding;
 
         &:hover, &:focus, &.active {
             text-decoration: none;
-            border-bottom: $default-border;
+
+            @media (max-width: $S) {
+                color: $general-text-color;
+                background-color: $navlink-background-color;
+                border-radius: $border-radius;
+            }
+
+            @media (min-width: $S) {
+                border-bottom: $default-border;
+            }
         }
     }
 }
@@ -38,7 +47,7 @@ main {
 }
 
 h1 {
-    margin-left: $small-margin;
+    margin: $small-margin 0 $small-margin $small-margin;
 }
 
 footer {
@@ -129,27 +138,38 @@ a.is-user {
     margin: 0;
     padding: $default-padding;
     border-left: $default-border;
+}
 
-    p:first-child {
-        margin-top: 0;
-    }
+.proposal-id {
+    display: inline-block;
+    font-family: monospace;
+    font-size: $monospace-font-size;
+    min-width: 4em;
+    border: $default-border;
+    border-radius: $border-radius;
+    padding: 0 $small-padding;
+    background-color: $proposal-id-background-color;
+    margin-right: $small-margin;
+    text-align: center;
 }
 
 details {
+    margin-top: $default-margin;
+
     summary {
         cursor: pointer;
     }
 
-    ul {
+    table {
         display: inline-block;
         background-color: white;
-        margin: $default-margin 0 0 0;
+        margin: $small-margin 0 0 0;
         padding: $default-padding;
         border: $default-border;
         border-radius: $border-radius;
     }
 
-    li {
+    td:first-child {
         text-align: right;
     }
 }
@@ -189,12 +209,14 @@ input[type=file] {
     background-color: white;
 }
 
-.tezos-wallet-input {
-    width: 38ch;
-}
+@media (min-width: $S) {
+    .tezos-wallet-input {
+        width: 38ch;
+    }
 
-.contract-address-input {
-    width: 41ch;
+    .contract-address-input {
+        width: 41ch;
+    }
 }
 
 .transfers-input {
@@ -223,6 +245,11 @@ input[type=file] {
 select {
     cursor: pointer;
     background-color: white;
+    text-align: right;
+    
+    option {
+        padding: 0 3em;
+    }
 }
 
 .form-input {
@@ -258,7 +285,7 @@ textarea {
 
 .message {
     background-color: $section-background-color;
-    min-width: 20em;
+    min-width: 30%;
     max-width: 80%;
     min-height: 10em;
     padding: $big-padding;

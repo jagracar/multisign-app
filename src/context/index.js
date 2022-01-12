@@ -5,7 +5,7 @@ import { BeaconWallet } from '@taquito/beacon-wallet';
 import { Parser } from '@taquito/michel-codec';
 import axios from 'axios';
 import { create } from 'ipfs-http-client';
-import { stringToHex } from '../utils';
+import { stringToHex, hexToString } from '../utils';
 import { ConfirmationMessage } from '../messages';
 
 // Load the multisign smart contrac code in JSON format
@@ -63,6 +63,23 @@ export class MultisignContextProvider extends React.Component {
                 .catch((error) => console.log('Error while querying the contract storage:', error));
 
             return response?.data;
+        };
+
+        // Gets the multisign user aliases
+        this.getUserAliases = async () => {
+            // Return if the contract storage is undefined
+            if (this.state.storage === undefined) return undefined;
+
+            // Send a query to tzkt to get the contract storage
+            console.log('Querying tzKt to get the user aliases...');
+            const response = await axios.get(`https://api.${network}.tzkt.io/v1/bigmaps/3919/keys?key.in=${this.state.storage.users.join(',')}`)
+                .catch((error) => console.log('Error while querying the user aliases:', error));
+
+            // Rearange the user aliases in a dictionary
+            const userAliases = response? {} : undefined;
+            response?.data.forEach((user) => {userAliases[user.key] = hexToString(user.value);});
+
+            return userAliases;
         };
 
         // Gets the multisign proposals
@@ -185,6 +202,7 @@ export class MultisignContextProvider extends React.Component {
                 // Update all the multisign data
                 await this.state.setBalance();
                 await this.state.setStorage();
+                await this.state.setUserAliases();
                 await this.state.setProposals();
                 await this.state.setUserVotes();
             },
@@ -211,6 +229,14 @@ export class MultisignContextProvider extends React.Component {
             // Sets the multisign contract storage
             setStorage: async () => this.setState({
                 storage: await this.getStorage()
+            }),
+
+            // The multisign user aliases
+            userAliases: undefined,
+
+            // Sets the multisign user aliases
+            setUserAliases: async () => this.setState({
+                userAliases: await this.getUserAliases()
             }),
 
             // The multisign proposals
@@ -320,6 +346,7 @@ export class MultisignContextProvider extends React.Component {
                 // Update the balance, storage and the proposals
                 await this.state.setBalance();
                 await this.state.setStorage();
+                await this.state.setUserAliases();
                 await this.state.setProposals();
             },
 
@@ -607,6 +634,7 @@ export class MultisignContextProvider extends React.Component {
         this.state.setActiveAccount()
             .then(() => this.state.setBalance())
             .then(() => this.state.setStorage())
+            .then(() => this.state.setUserAliases())
             .then(() => this.state.setProposals())
             .then(() => this.state.setUserVotes());
     }

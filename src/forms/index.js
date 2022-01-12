@@ -3,6 +3,7 @@ import { MultisignContext } from '../context';
 import { Button } from '../button';
 import { IpfsLink } from '../link';
 import { ErrorMessage } from '../messages';
+import { tokens } from '../utils';
 
 
 export function ContractSelectionForm() {
@@ -119,6 +120,7 @@ export function CreateProposalForms() {
                 <h2>Remove user proposal</h2>
                 <RemoveUserProposalForm
                     users={context.storage.users}
+                    aliases={context.userAliases}
                     handleSubmit={context.createRemoveUserProposal}
                 />
             </section>
@@ -316,15 +318,9 @@ function TransferTokenProposalForm(props) {
                     />
                     <datalist id='tokenContracts'>
                         <option value=''></option>
-                        <option value='KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton'>OBJKT</option>
-                        <option value='KT1AFA2mwNUMNd4SsujE1YYp29vd8BZejyKW'>hDAO</option>
-                        <option value='KT1LHHLso8zQWQWg1HUukajdxxbkGfNoHjh6'>Tezzardz</option>
-                        <option value='KT1VbHpQmtkA3D4uEbbju26zS8C42M5AGNjZ'>PRJKTNEON</option>
-                        <option value='KT1LbLNTTPoLgpumACCBFJzBEHDiEUqNxz5C'>Art Cardz</option>
-                        <option value='KT1SyPgtiXTaEfBuMZKviWGNHqVrBBEjvtfQ'>GOGOs</option>
-                        <option value='KT1MsdyBSAMQwzvDH4jt2mxUKJvBSWZuPoRJ'>NEONZ</option>
-                        <option value='KT1HZVd9Cjc2CMe3sQvXgbxhpJkdena21pih'>Randomly Common Skeles</option>
-                        <option value='KT1PNcZQkJXMQ2Mg92HG1kyrcu3auFX5pfd8'>ZIGGURATS</option>
+                        {tokens.map((token) => (
+                            <option key={token.fa2} value={token.fa2}>{token.name}</option>
+                        ))}
                     </datalist>
                 </label>
                 <br />
@@ -494,7 +490,7 @@ function AddUserProposalForm(props) {
 
 function RemoveUserProposalForm(props) {
     // Set the component state
-    const [user, setUser] = useState(props.users[0]);
+    const [user, setUser] = useState('');
 
     // Define the on change handler
     const handleChange = (e) => {
@@ -511,13 +507,25 @@ function RemoveUserProposalForm(props) {
         <form onSubmit={handleSubmit}>
             <label className='form-input'>User to remove:
                 {' '}
-                <select value={user} onChange={handleChange}>
+                <input
+                    type='text'
+                    list='users'
+                    spellCheck='false'
+                    minLength='36'
+                    maxLength='36'
+                    className='contract-address-input'
+                    value={user}
+                    onMouseDown={() => setUser('')}
+                    onChange={handleChange}
+                />
+                <datalist id='users'>
+                    <option value=''></option>
                     {props.users.map((userWallet, index) => (
                         <option key={index} value={userWallet}>
-                            {userWallet}
+                            {props.aliases? props.aliases[userWallet] : userWallet}
                         </option>
                     ))}
-                </select>
+                </datalist>
             </label>
             <input type='submit' value='send proposal' />
         </form>
