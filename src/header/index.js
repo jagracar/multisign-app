@@ -19,7 +19,7 @@ export function Navigation() {
         <nav>
             <ul>
                 <li>
-                    <NavLink to='/'>Multisign</NavLink>
+                    <NavLink to='/'>Home</NavLink>
                 </li>
                 <li>
                     <NavLink to='/proposals'>Proposals</NavLink>

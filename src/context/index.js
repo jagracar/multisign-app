@@ -6,7 +6,8 @@ import { Parser } from '@taquito/michel-codec';
 import axios from 'axios';
 import { create } from 'ipfs-http-client';
 import { stringToHex, hexToString } from '../utils';
-import { ConfirmationMessage } from '../messages';
+import { ConfirmationMessage, ErrorMessage } from '../messages';
+
 
 // Load the multisign smart contrac code in JSON format
 const multisigContractJsonFile = require('../contract/multisignContract.json');
@@ -38,82 +39,116 @@ export class MultisignContextProvider extends React.Component {
         // Pass the properties to the base class
         super(props);
 
-        // Gets the current active account
-        this.getActiveAccount = async () => {
+        // Sets the current active account
+        this.setActiveAccount = async () => {
+            // Get the current active account
             console.log('Accessing the current active account...');
-            return await wallet.client.getActiveAccount()
+            const activeAccount = await wallet.client.getActiveAccount()
                 .catch((error) => console.log('Error while accessing the active account:', error));
+
+            // Update the component state
+            this.setState({
+                activeAccount: activeAccount
+            });
+
+            console.log('Active account updated');
         };
 
-        // Gets the multisign contract balance
-        this.getBalance = async () => {
+        // Sets the multisign contract balance
+        this.setBalance = async () => {
             // Send a query to tzkt to get the contract balance
             console.log('Querying tzKt to get the multisign contract balance...');
-            const response = await axios.get(`https://api.${network}.tzkt.io/v1/accounts/${this.state.contractAddress}/balance`)
+            const response = await axios.get(`https://api.${this.state.network}.tzkt.io/v1/accounts/${this.state.contractAddress}/balance`)
                 .catch((error) => console.log('Error while querying the contract balance:', error));
 
-            return response?.data;
+            // Update the component state
+            this.setState({
+                balance: response?.data
+            });
+
+            console.log('Contract balance updated');
         };
 
-        // Gets the multisign contract storage
-        this.getStorage = async () => {
+        // Sets the multisign contract storage
+        this.setStorage = async () => {
             // Send a query to tzkt to get the contract storage
             console.log('Querying tzKt to get the multisign contract storage...');
-            const response = await axios.get(`https://api.${network}.tzkt.io/v1/contracts/${this.state.contractAddress}/storage`)
+            const response = await axios.get(`https://api.${this.state.network}.tzkt.io/v1/contracts/${this.state.contractAddress}/storage`)
                 .catch((error) => console.log('Error while querying the contract storage:', error));
 
-            return response?.data;
+            // Update the component state
+            this.setState({
+                storage: response?.data
+            });
+
+            console.log('Contract storage updated');
         };
 
-        // Gets the multisign user aliases
-        this.getUserAliases = async () => {
-            // Return if the contract storage is undefined
-            if (this.state.storage === undefined) return undefined;
+        // Sets the multisign user aliases
+        this.setUserAliases = async () => {
+            // Check if the contract storage is defined
+            if (this.state.storage) {
+                // Send a query to tzkt to get the user aliases
+                console.log('Querying tzKt to get the user aliases...');
+                const response = await axios.get(`https://api.${this.state.network}.tzkt.io/v1/bigmaps/3919/keys?key.in=${this.state.storage.users.join(',')}`)
+                    .catch((error) => console.log('Error while querying the user aliases:', error));
 
-            // Send a query to tzkt to get the contract storage
-            console.log('Querying tzKt to get the user aliases...');
-            const response = await axios.get(`https://api.${network}.tzkt.io/v1/bigmaps/3919/keys?key.in=${this.state.storage.users.join(',')}`)
-                .catch((error) => console.log('Error while querying the user aliases:', error));
+                // Rearange the user aliases in a dictionary
+                const userAliases = response? {} : undefined;
+                response?.data.forEach((user) => {userAliases[user.key] = hexToString(user.value);});
 
-            // Rearange the user aliases in a dictionary
-            const userAliases = response? {} : undefined;
-            response?.data.forEach((user) => {userAliases[user.key] = hexToString(user.value);});
+                // Update the component state
+                this.setState({
+                    userAliases: userAliases
+                });
+            } else {
+                // Update the component state
+                this.setState({
+                    userAliases: undefined
+                });
+            }
 
-            return userAliases;
+            console.log('User aliases updated');
         };
 
-        // Gets the multisign proposals
-        this.getProposals = async () => {
-            // Return if the contract storage is undefined
-            if (this.state.storage === undefined) return undefined;
+        // Sets the multisign proposals
+        this.setProposals = async () => {
+             // Check if the contract storage is defined
+            if (this.state.storage) {
+                // Send a query to tzkt to get all the proposals bigmap keys
+                console.log('Querying tzKt to get the multisign proposals...');
+                const response = await axios.get(`https://api.${this.state.network}.tzkt.io/v1/bigmaps/${this.state.storage.proposals}/keys`, {
+                        params: {
+                            limit: 10000,
+                            active: true,
+                            select: 'key,value',
+                        }
+                    })
+                    .catch((error) => console.log('Error while querying the proposals bigmap:', error));
 
-            // Send a query to tzkt to get all the proposals bigmap keys
-            console.log('Querying tzKt to get the multisign proposals...');
-            const response = await axios.get(`https://api.${network}.tzkt.io/v1/bigmaps/${this.state.storage.proposals}/keys`, {
+                // Update the component state
+                this.setState({
+                    proposals: response?.data.reverse()
+                });
+            } else {
+                // Update the component state
+                this.setState({
+                    proposals: undefined
+                });
+            }
+
+            console.log('Multisign proposals updated');
+        };
+
+        // Sets the votes from the active account
+        this.setUserVotes = async () => {
+             // Check if the active account and the contract storage are defined
+            if (this.state.activeAccount && this.state.storage) {
+                // Send a query to tzkt to get the user votes
+                console.log('Querying tzKt to get the user votes...');
+                const response = await axios.get(`https://api.${this.state.network}.tzkt.io/v1/bigmaps/${this.state.storage.votes}/keys`, {
                     params: {
-                        limit: 10000,
-                        active: true,
-                        select: 'key,value',
-                    }
-                })
-                .catch((error) => console.log('Error while querying the proposals bigmap:', error));
-
-            return response?.data.reverse();
-        };
-
-        // Gets the votes from a given multisign user
-        this.getUserVotes = async (userAddress) => {
-            // Return if the user address is undefined
-            if (userAddress === undefined) return undefined;
-
-            // Return if the contract storage is undefined
-            if (this.state.storage === undefined) return undefined;
-
-            // Send a query to tzkt to get the desired votes bigmap keys
-            console.log('Querying tzKt to get the user votes...');
-            const response = await axios.get(`https://api.${network}.tzkt.io/v1/bigmaps/${this.state.storage.votes}/keys`, {
-                    params: {
-                        'key.address': userAddress,
+                        'key.address': this.state.activeAccount.address,
                         limit: 10000,
                         active: true,
                         select: 'key,value',
@@ -121,24 +156,53 @@ export class MultisignContextProvider extends React.Component {
                 })
                 .catch((error) => console.log('Error while querying the votes bigmap:', error));
 
-            // Rearange the user votes information in a dictionary
-            const userVotes = response? {} : undefined;
-            response?.data.forEach((vote) => {userVotes[vote.key.nat] = vote.value;});
+                // Rearange the user votes information in a dictionary
+                const userVotes = response? {} : undefined;
+                response?.data.forEach((vote) => {userVotes[vote.key.nat] = vote.value;});
 
-            return userVotes;
+                // Update the component state
+                this.setState({
+                    userVotes: userVotes
+                });
+            } else {
+                // Update the component state
+                this.setState({
+                    userVotes: undefined
+                });
+            }
+
+            console.log('User votes updated');
         };
 
-        // Gets the multisign contract reference
-        this.getContract = async () => {
-            console.log('Accessing multisign contract...');
-            return await tezos.wallet.at(this.state.contractAddress)
+        // Sets the multisign contract reference
+        this.setContract = async () => {
+            // Get the multisign contract reference
+            console.log('Accessing the multisign contract...');
+            const contract = await tezos.wallet.at(this.state.contractAddress)
                 .catch((error) => console.log('Error while accessing the contract:', error));
+
+            // Update the component state
+            this.setState({
+                contract: contract
+            });
+
+            console.log('Contract reference updated');
         };
+
+        // Sets the confirmation message
+        this.setConfirmationMessage = (message) => this.setState({
+            confirmationMessage: message
+        });
+
+        // Sets the error message
+        this.setErrorMessage = (message) => this.setState({
+            errorMessage: message
+        });
 
         // Checks if the multisign contract reference is available
         this.contractIsAvailable = async () => {
-            // Set the multisign contract if it's undefined
-            if (this.state.contract === undefined) await this.state.setContract();
+            // Try to set the multisign contract reference if it's undefined
+            if (this.state.contract === undefined) await this.setContract();
 
             return this.state.contract !== undefined;
         };
@@ -149,7 +213,7 @@ export class MultisignContextProvider extends React.Component {
             if (operation === undefined) return;
 
             // Display the confirmation message
-            this.state.setConfirmationMessage('Waiting for the operation to be confirmed...');
+            this.setConfirmationMessage('Waiting for the operation to be confirmed...');
 
             // Wait for the operation to be confirmed
             console.log('Waiting for the operation to be confirmed...');
@@ -158,19 +222,20 @@ export class MultisignContextProvider extends React.Component {
                 .catch((error) => console.log('Error while confirming the operation:', error));
 
             // Remove the confirmation message
-            this.state.setConfirmationMessage(undefined);
+            this.setConfirmationMessage(undefined);
         };
 
         // Originates a contract with the provided storage
         this.originateContract = async (contract, storage) => {
             console.log('Originating contract...');
-            return await tezos.wallet.originate({code: contract, storage: storage}).send()
-                .then((originationOp) => {
-                    console.log('Waiting for confirmation of origination...');
-                    return originationOp.contract();
-                })
-                .then((contract) => console.log(`Origination completed for ${contract.address}.`))
+            const originationOp = await tezos.wallet.originate({code: contract, storage: storage}).send()
                 .catch((error) => console.log('Error while originating the contract:', error));
+
+            console.log('Waiting for confirmation of origination...');
+            const c = await originationOp.contract();
+
+            console.log(`Origination completed for ${c.address}.`);
+            return c;
         };
 
         // Define the component state parameters
@@ -181,119 +246,72 @@ export class MultisignContextProvider extends React.Component {
             // The multisign contract address
             contractAddress: multisignContractAddress,
 
+            // The current active account
+            activeAccount: undefined,
+
+            // The multisign contract balance in mutez
+            balance: undefined,
+
+            // The multisign contract storage
+            storage: undefined,
+
+            // The multisign user aliases
+            userAliases: undefined,
+
+            // The multisign proposals
+            proposals: undefined,
+
+            // The user votes
+            userVotes: undefined,
+
+            // The multisign contract reference
+            contract: undefined,
+
+            // The confirmation message
+            confirmationMessage: undefined,
+
+            // The error message
+            errorMessage: undefined,
+
             // Sets the multisign contract address
             setContractAddress: async (contractAddress) => {
                 // Return if the contract address is not a proper address
-                if (!(contractAddress && contractAddress !== '' && validateAddress(contractAddress) === 3)) {
-                    this.state.setErrorMessage(`The provided address is not a valid contract address: ${contractAddress}`);
+                if (!(contractAddress && validateAddress(contractAddress) === 3)) {
+                    this.setErrorMessage(`The provided address is not a valid contract address: ${contractAddress}`);
                     return;
                 }
 
                 // Update the contract address and reset other contract variables
                 this.setState({
                     contractAddress: contractAddress,
-                    contract: undefined,
                     balance: undefined,
                     storage: undefined,
+                    userAliases: undefined,
                     proposals: undefined,
-                    userVotes: undefined
-                })
+                    userVotes: undefined,
+                    contract: undefined
+                });
 
                 // Update all the multisign data
-                await this.state.setBalance();
-                await this.state.setStorage();
-                await this.state.setUserAliases();
-                await this.state.setProposals();
-                await this.state.setUserVotes();
+                await this.setBalance();
+                await this.setStorage();
+                await this.setUserAliases();
+                await this.setProposals();
+                await this.setUserVotes();
             },
-
-            // The current active account
-            activeAccount: undefined,
-
-            // Sets the current active account
-            setActiveAccount: async () => this.setState({
-                activeAccount: await this.getActiveAccount()
-            }),
-
-            // The multisign contract balance in mutez
-            balance: undefined,
-
-            // Sets the multisign contract balance in mutez
-            setBalance: async () => this.setState({
-                balance: await this.getBalance()
-            }),
-
-            // The multisign contract storage
-            storage: undefined,
-
-            // Sets the multisign contract storage
-            setStorage: async () => this.setState({
-                storage: await this.getStorage()
-            }),
-
-            // The multisign user aliases
-            userAliases: undefined,
-
-            // Sets the multisign user aliases
-            setUserAliases: async () => this.setState({
-                userAliases: await this.getUserAliases()
-            }),
-
-            // The multisign proposals
-            proposals: undefined,
-
-            // Sets the multisign proposals
-            setProposals: async () => this.setState({
-                proposals: await this.getProposals()
-            }),
-
-            // The user votes
-            userVotes: undefined,
-
-            // Sets the user votes
-            setUserVotes: async () => this.setState({
-                userVotes: await this.getUserVotes(this.state.activeAccount?.address)
-            }),
-
-            // The multisign contract reference
-            contract: undefined,
-
-            // Sets the multisign contract reference
-            setContract: async () => this.setState({
-                contract: await this.getContract()
-            }),
-
-            // The confirmation message
-            confirmationMessage: undefined,
-
-            // Sets the confirmation message
-            setConfirmationMessage: (message) => this.setState({
-                confirmationMessage: message
-            }),
-
-            // The error message
-            errorMessage: undefined,
-
-            // Sets the error message
-            setErrorMessage: (message) => this.setState({
-                errorMessage: message
-            }),
 
             // Connects the user wallet if it was not connected before
             connectWallet: async () => {
-                // Return if there is already an active account
-                if (this.state.activeAccount) return;
-
                 // Ask the user for the permission to use the wallet
                 console.log('Connecting the user wallet...');
-                await wallet.requestPermissions({network: {type: network, rpcUrl: rpcNode}})
+                await wallet.requestPermissions({network: {type: this.state.network, rpcUrl: rpcNode}})
                     .catch((error) => console.log('Error while requesting wallet permissions:', error));
 
                 // Set the active account state
-                await this.state.setActiveAccount();
+                await this.setActiveAccount();
 
                 // Set the user votes
-                await this.state.setUserVotes();
+                await this.setUserVotes();
             },
 
             // Disconnects the user wallet
@@ -302,11 +320,9 @@ export class MultisignContextProvider extends React.Component {
                 console.log('Disconnecting the user wallet...');
                 await wallet.client.clearActiveAccount();
 
-                // Update the active account state
-                await this.state.setActiveAccount();
-
-                // Set the user votes and the contract reference as undefined
+                // Reset the active account, the user votes and the contract reference as undefined
                 this.setState({
+                    activeAccount: undefined,
                     userVotes: undefined,
                     contract: undefined
                 });
@@ -326,8 +342,8 @@ export class MultisignContextProvider extends React.Component {
                 await this.confirmOperation(operation);
 
                 // Update the proposals and the user votes
-                await this.state.setProposals();
-                await this.state.setUserVotes();
+                await this.setProposals();
+                await this.setUserVotes();
             },
 
             // Executes a proposal
@@ -344,10 +360,10 @@ export class MultisignContextProvider extends React.Component {
                 await this.confirmOperation(operation);
 
                 // Update the balance, storage and the proposals
-                await this.state.setBalance();
-                await this.state.setStorage();
-                await this.state.setUserAliases();
-                await this.state.setProposals();
+                await this.setBalance();
+                await this.setStorage();
+                await this.setUserAliases();
+                await this.setProposals();
             },
 
             // Creates a transfer mutez proposal
@@ -363,7 +379,7 @@ export class MultisignContextProvider extends React.Component {
                     const destination = transfer.destination;
 
                     if (!(destination && destination !== '' && validateAddress(destination) === 3)) {
-                        this.state.setErrorMessage(`The provided address is not a valid tezos address: ${destination}`);
+                        this.setErrorMessage(`The provided address is not a valid tezos address: ${destination}`);
                         return;
                     }
 
@@ -372,7 +388,7 @@ export class MultisignContextProvider extends React.Component {
 
                 // Check that the total amount is smaller thant the contract balance
                 if (totalAmount >= this.state.balance) {
-                    this.state.setErrorMessage('The total amount of tez to transfer is larger than the current contract balance');
+                    this.setErrorMessage('The total amount of tez to transfer is larger than the current contract balance');
                     return;
                 }
 
@@ -385,7 +401,7 @@ export class MultisignContextProvider extends React.Component {
                 await this.confirmOperation(operation);
 
                 // Update the proposals
-                await this.state.setProposals();
+                await this.setProposals();
             },
 
             // Creates a transfer token proposal
@@ -395,7 +411,7 @@ export class MultisignContextProvider extends React.Component {
 
                 // Check that the token contract address is a valid address
                 if (!(tokenContract && tokenContract !== '' && validateAddress(tokenContract) === 3)) {
-                    this.state.setErrorMessage(`The provided token contract address is not a valid tezos address: ${tokenContract}`);
+                    this.setErrorMessage(`The provided token contract address is not a valid tezos address: ${tokenContract}`);
                     return;
                 }
 
@@ -405,7 +421,7 @@ export class MultisignContextProvider extends React.Component {
                     const destination = transfer.destination;
 
                     if (!(destination && destination !== '' && validateAddress(destination) === 3)) {
-                        this.state.setErrorMessage(`The provided address is not a valid tezos address: ${destination}`);
+                        this.setErrorMessage(`The provided address is not a valid tezos address: ${destination}`);
                         return;
                     }
                 }
@@ -419,7 +435,7 @@ export class MultisignContextProvider extends React.Component {
                 await this.confirmOperation(operation);
 
                 // Update the proposals
-                await this.state.setProposals();
+                await this.setProposals();
             },
 
             // Creates an add user proposal
@@ -429,13 +445,13 @@ export class MultisignContextProvider extends React.Component {
 
                 // Check that the user address is a valid address
                 if (!(userAddress && userAddress !== '' && validateAddress(userAddress) === 3)) {
-                    this.state.setErrorMessage('The provided address is not a valid tezos address');
+                    this.setErrorMessage('The provided address is not a valid tezos address');
                     return;
                 }
 
                 // Check that the user address is not in the multisign users
                 if (this.state.storage?.users.includes(userAddress)) {
-                    this.state.setErrorMessage('The provided address is already a multisign user');
+                    this.setErrorMessage('The provided address is already a multisign user');
                     return;
                 }
 
@@ -448,7 +464,7 @@ export class MultisignContextProvider extends React.Component {
                 await this.confirmOperation(operation);
 
                 // Update the proposals
-                await this.state.setProposals();
+                await this.setProposals();
             },
 
             // Creates a remove user proposal
@@ -458,13 +474,13 @@ export class MultisignContextProvider extends React.Component {
 
                 // Check that the user address is a valid address
                 if (!(userAddress && userAddress !== '' && validateAddress(userAddress) === 3)) {
-                    this.state.setErrorMessage('The provided address is not a valid tezos address');
+                    this.setErrorMessage('The provided address is not a valid tezos address');
                     return;
                 }
 
                 // Check that the user address is in the multisign users
                 if (!this.state.storage?.users.includes(userAddress)) {
-                    this.state.setErrorMessage('The provided address is not a multisign user');
+                    this.setErrorMessage('The provided address is not a multisign user');
                     return;
                 }
 
@@ -477,7 +493,7 @@ export class MultisignContextProvider extends React.Component {
                 await this.confirmOperation(operation);
 
                 // Update the proposals
-                await this.state.setProposals();
+                await this.setProposals();
             },
 
             // Creates a minimum votes proposal
@@ -487,7 +503,7 @@ export class MultisignContextProvider extends React.Component {
 
                 // Check that the minimum votes are within the expected range
                 if (minimumVotes <= 0 || minimumVotes > this.state.storage?.users.length) {
-                    this.state.setErrorMessage('The minimum votes need to be higher than 0 and less or equal to the number of multisign users');
+                    this.setErrorMessage('The minimum votes need to be higher than 0 and less or equal to the number of multisign users');
                     return;
                 }
 
@@ -500,7 +516,7 @@ export class MultisignContextProvider extends React.Component {
                 await this.confirmOperation(operation);
 
                 // Update the proposals
-                await this.state.setProposals();
+                await this.setProposals();
             },
 
             // Creates an expiration time proposal
@@ -510,7 +526,7 @@ export class MultisignContextProvider extends React.Component {
 
                 // Check that the expiration time is higher than 1 day
                 if (expirationTime <= 0) {
-                    this.state.setErrorMessage('The expiration time needs to be higher than 1 day');
+                    this.setErrorMessage('The expiration time needs to be higher than 1 day');
                     return;
                 }
 
@@ -523,7 +539,7 @@ export class MultisignContextProvider extends React.Component {
                 await this.confirmOperation(operation);
 
                 // Update the proposals
-                await this.state.setProposals();
+                await this.setProposals();
             },
 
             // Creates a lambda function proposal
@@ -538,7 +554,7 @@ export class MultisignContextProvider extends React.Component {
                     const parser = new Parser();
                     lambdaFunction = parser.parseMichelineExpression(michelineCode);
                 } catch (error) {
-                    this.state.setErrorMessage('The provided lambda function Michelson code is not correct');
+                    this.setErrorMessage('The provided lambda function Michelson code is not correct');
                     return;
                 }
 
@@ -551,7 +567,7 @@ export class MultisignContextProvider extends React.Component {
                 await this.confirmOperation(operation);
 
                 // Update the proposals
-                await this.state.setProposals();
+                await this.setProposals();
             },
 
             // Creates a text proposal
@@ -561,7 +577,7 @@ export class MultisignContextProvider extends React.Component {
 
                 // Check that the IPFS path is not undefined
                 if (!ipfsPath) {
-                    this.state.setErrorMessage('The text proposal needs to be uploaded first to IPFS');
+                    this.setErrorMessage('The text proposal needs to be uploaded first to IPFS');
                     return;
                 }
 
@@ -574,14 +590,14 @@ export class MultisignContextProvider extends React.Component {
                 await this.confirmOperation(operation);
 
                 // Update the proposals
-                await this.state.setProposals();
+                await this.setProposals();
             },
 
             // Uploads a file to ipfs and returns the ipfs path
             uploadToIpfs: async (file) => {
                 // Check that the file is not undefined
                 if (!file) {
-                    this.state.setErrorMessage('A file needs to be loaded before uploading to IPFS');
+                    this.setErrorMessage('A file needs to be loaded before uploading to IPFS');
                     return;
                 }
 
@@ -589,7 +605,7 @@ export class MultisignContextProvider extends React.Component {
                 const client = create('https://ipfs.infura.io:5001/api/v0');
 
                 // Display the confirmation message
-                this.state.setConfirmationMessage(`Uploading ${file.name} to ipfs...`);
+                this.setConfirmationMessage(`Uploading ${file.name} to ipfs...`);
 
                 // Upload the file to IPFS
                 console.log(`Uploading ${file.name} to ipfs...`);
@@ -597,7 +613,7 @@ export class MultisignContextProvider extends React.Component {
                     .catch((error) => console.log(`Error while uploading ${file.name} to ipfs:`, error));
 
                 // Remove the confirmation message
-                this.state.setConfirmationMessage(undefined);
+                this.setConfirmationMessage(undefined);
 
                  // Return the IPFS path
                 return added?.path;
@@ -605,38 +621,37 @@ export class MultisignContextProvider extends React.Component {
 
             // Originates a new multisign smart contract
             originate: async () => {
+                // Initalize the contract metadata big map
                 const metadataBigmap = new MichelsonMap();
-                const proposalsBigmap = new MichelsonMap();
-                const votesBigmap = new MichelsonMap();
-
                 metadataBigmap.set('', '697066733a2f2f516d52566b6f7053715a4c784d594b5a784e6b5a72703467385a365968706a456f6278594c544d6d4c4275795237');
 
+                // Initialize the contract storage
                 const storage = {
                     counter: 0,
                     expiration_time: 5,
                     metadata: metadataBigmap,
                     minimum_votes: 4,
-                    proposals: proposalsBigmap,
+                    proposals: new MichelsonMap(),
                     users: [
                         'tz1gnL9CeM5h5kRzWZztFYLypCNnVQZjndBN',
                         'tz1h9TG6uuxv2FtmE5yqMyKQqx8hkXk7NY6c'
                     ],
-                    votes: votesBigmap
-                }
+                    votes: new MichelsonMap()
+                };
 
-                this.originateContract(multisigContractJsonFile, storage);
+                await this.originateContract(multisigContractJsonFile, storage);
             },
         };
     }
 
     componentDidMount() {
-        // Set the active account, the contract storage, the proposals and the user votes
-        this.state.setActiveAccount()
-            .then(() => this.state.setBalance())
-            .then(() => this.state.setStorage())
-            .then(() => this.state.setUserAliases())
-            .then(() => this.state.setProposals())
-            .then(() => this.state.setUserVotes());
+        // Initialize all the relevant information in the correct order
+        this.setActiveAccount()
+            .then(() => this.setBalance())
+            .then(() => this.setStorage())
+            .then(() => this.setUserAliases())
+            .then(() => this.setProposals())
+            .then(() => this.setUserVotes());
     }
 
     render() {
@@ -644,6 +659,10 @@ export class MultisignContextProvider extends React.Component {
             <MultisignContext.Provider value={this.state}>
                 {this.state.confirmationMessage &&
                     <ConfirmationMessage message={this.state.confirmationMessage} />
+                }
+
+                {this.state.errorMessage &&
+                    <ErrorMessage message={this.state.errorMessage} onClick={() => this.setErrorMessage(undefined)} />
                 }
 
                 {this.props.children}

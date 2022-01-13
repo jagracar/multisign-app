@@ -2,7 +2,6 @@ import React, { useContext, useState } from 'react';
 import { MultisignContext } from '../context';
 import { Button } from '../button';
 import { IpfsLink } from '../link';
-import { ErrorMessage } from '../messages';
 import { tokens } from '../utils';
 
 
@@ -21,13 +20,11 @@ export function ContractSelectionForm() {
 
     return (
         <>
-            {context.errorMessage &&
-                <ErrorMessage message={context.errorMessage} onClick={() => context.setErrorMessage(undefined)} />
-            }
-
             <section>
+                <h2>Deployed multisigns</h2>
+                <p>Use this form to select one of the deployed multisigns. Click the load button to access the multising information.</p>
                 <form onSubmit={handleSubmit}>
-                    <label className='form-input'>Select multisign:
+                    <label className='form-input'>Multisign address:
                         {' '}
                         <input
                             type='text'
@@ -76,12 +73,12 @@ export function CreateProposalForms() {
 
     return (
         <>
-            {context.errorMessage &&
-                <ErrorMessage message={context.errorMessage} onClick={() => context.setErrorMessage(undefined)} />
-            }
-
             <section>
                 <h2>Transfer tez proposal</h2>
+                <p>
+                    Use this form to create a proposal that, if accepted, it will transfer
+                    the specified amount of tez from the multising to a list of tezos addresses.
+                </p>
                 <TransferTezProposalForm
                     handleSubmit={context.createTransferMutezProposal}
                 />
@@ -89,6 +86,10 @@ export function CreateProposalForms() {
 
             <section>
                 <h2>Transfer token proposal</h2>
+                <p>
+                    Use this form to create a proposal that, if accepted, it will transfer
+                    the specified amount of token editions from the multising to a list of tezos addresses.
+                </p>
                 <TransferTokenProposalForm
                     handleSubmit={context.createTransferTokenProposal}
                 />
@@ -96,6 +97,14 @@ export function CreateProposalForms() {
 
             <section>
                 <h2>Text proposal</h2>
+                <p>
+                    Use this form to create a proposal to approve a text or decission.
+                </p>
+                <p>
+                    This proposal has no direct consequences on the blockchain. However, if accepted and executed,
+                    it should trigger some off-chain actions by one of the multisign members (e.g. change a website UI,
+                    decide on a dog name, buy bread at the bakery). The text will be stored in IPFS for archival purposes.
+                </p>
                 <TextProposalForm
                     uploadToIpfs={context.uploadToIpfs}
                     handleSubmit={context.createTextProposal}
@@ -104,6 +113,20 @@ export function CreateProposalForms() {
 
             <section>
                 <h2>Lambda function proposal</h2>
+                <p>
+                    Use this form to create a proposal that, if accepted, it will execute some smart contract code
+                    stored in a Michelson lambda function.
+                </p>
+                <p>
+                    This proposal could be used to administer other smart contracts of which the multsign is the admin
+                    (e.g. to update some smart contract fees), or to execute entry points from other contracts (e.g. swap
+                    or collect a token, vote in anoter DAO / multisign).
+                </p>
+                <p className='create-proposal-warning'>
+                    Warning: Executing arbitrary smart contract code could compromise the multisign or have unexpected
+                    consequences. The lambda function code should have been revised by some trusted smart contract expert
+                    before the proposal is accepted and executed.
+                </p>
                 <LambdaFunctionProposalForm
                     handleSubmit={context.createLambdaFunctionProposal}
                 />
@@ -111,6 +134,13 @@ export function CreateProposalForms() {
 
             <section>
                 <h2>Add user proposal</h2>
+                <p>
+                    Use this form to create a proposal that, if accepted, it will add a new user to the multisign.
+                </p>
+                <p className='create-proposal-warning'>
+                    Warning: The minimum number of positive votes required to approve a proposal will not be updated,
+                    so adding a new user will effectively make easier to approve proposals.
+                </p>
                 <AddUserProposalForm
                     handleSubmit={context.createAddUserProposal}
                 />
@@ -118,6 +148,13 @@ export function CreateProposalForms() {
 
             <section>
                 <h2>Remove user proposal</h2>
+                <p>
+                    Use this form to create a proposal that, if accepted, it will remove one of the multisign users.
+                </p>
+                <p className='create-proposal-warning'>
+                    Warning: The minimum number of votes required to approve a proposal will not be updated. Depending
+                    on the situation, it might become more difficult to approve proposals.
+                </p>
                 <RemoveUserProposalForm
                     users={context.storage.users}
                     aliases={context.userAliases}
@@ -127,6 +164,14 @@ export function CreateProposalForms() {
 
             <section>
                 <h2>Minimum votes proposal</h2>
+                <p>
+                    Use this form to create a proposal that, if accepted, it will change the minimum number of positive
+                    votes required to approve proposals.
+                </p>
+                <p className='create-proposal-warning'>
+                    Warning: This will affect all active proposals at the time of execution. If the minimum votes is decreased,
+                    some active proposals might become accepted and it will be possible to execute them.
+                </p>
                 <MinimumVotesProposalForm
                     defaultValue={context.storage.minimum_votes}
                     handleSubmit={context.createMinimumVotesProposal}
@@ -135,6 +180,15 @@ export function CreateProposalForms() {
 
             <section>
                 <h2>Expiration time proposal</h2>
+                <p>
+                    Use this form to create a proposal that, if accepted, it will change the proposals expiration time.
+                </p>
+                <p className='create-proposal-warning'>
+                    Warning: This will affect all active and expired proposals at the time of execution. If the expiration
+                    time is increased, some expired proposals might become active again. Some might even become executable if
+                    they have enough positive votes. If the expiration time is decreased, some previously active proposal might
+                    become expired.
+                </p>
                 <ExpirationTimeProposalForm
                     defaultValue={context.storage.expiration_time}
                     handleSubmit={context.createExpirationTimeProposal}

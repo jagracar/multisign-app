@@ -6,57 +6,81 @@ html, body, #root, .app-container {
     height: 100%;
 }
 
+ul {
+    margin: 0;
+    padding: 0;
+
+    @media (min-width: $S) {
+        margin: $default-margin 0 $default-margin $big-margin;
+    }
+}
+
+li {
+    list-style-type: none;
+}
+
+h1 {
+    margin: $small-margin 0.2em;
+}
+
+p {
+    max-width: $text-max-width;
+}
+
 .header-container {
-    padding: $default-padding $default-padding $default-padding $big-padding;
+    padding: $small-padding;
+
+    @media (min-width: $S) {
+        padding: $default-padding;
+    }
 }
 
 nav {
     ul {
         margin: 0;
         padding: 0;
+
+        @media (min-width: $S) {
+            margin-left: $small-padding;
+        }
     }
 
     li {
         display: inline-block;
-        margin: 0 $default-margin $default-margin 0;
-        list-style-type: none;
+        margin: 0 $small-margin $small-margin 0;
     }
 
     a {
+        display: inline-block;
         color: $header-color;
-        padding: $small-padding;
 
         &:hover, &:focus, &.active {
+            color: $header-color;
+            border-bottom: $default-border;
             text-decoration: none;
-
-            @media (max-width: $S) {
-                color: $general-text-color;
-                background-color: $navlink-background-color;
-                border-radius: $border-radius;
-            }
-
-            @media (min-width: $S) {
-                border-bottom: $default-border;
-            }
         }
     }
 }
 
 main {
-    padding: 0 $default-padding;
-}
+    padding: 0 $small-padding;
 
-h1 {
-    margin: $small-margin 0 $small-margin $small-margin;
+    @media (min-width: $S) {
+        padding: 0 $default-padding;
+    }
 }
 
 footer {
     background-color: $footer-background-color;
     border-top: $default-border;
-    padding: 0 $big-padding;
+    padding: 0 $default-padding;
+
+    @media (min-width: $S) {
+        padding: 0 $big-padding;
+    }
 }
 
-button, input, select, .proposal-votes, .users-list a {
+button, input, .users-list a, .proposal-votes {
     display: inline-block;
     font-family: monospace;
     font-size: $monospace-font-size;
@@ -77,8 +101,28 @@ button, input[type=submit], .users-list a {
     }
 }
 
-.users-list a {
-    word-break: break-word;
+.parameters-list > li {
+    margin: $default-margin 0;
+
+    &:last-child {
+        margin-bottom: $small-margin;
+    }
+}
+
+.users-list {
+    margin: $default-margin 0;
+
+    a {
+        word-break: break-word;
+    }
+}
+
+a.is-user {
+    background-color: $is-user-background-color;
+
+    &:hover {
+        background-color: $is-user-hover-background-color;
+    }
 }
 
 .tezos-address {
@@ -87,31 +131,14 @@ button, input[type=submit], .users-list a {
 }
 
 section {
-    margin-bottom: $default-margin;
     background-color: $section-background-color;
-    padding: $default-padding;
+    margin-bottom: $default-margin;
+    padding: $small-padding;
     border: $default-border;
     border-radius: $big-border-radius;
-}
 
-ul {
-    margin: $default-margin $big-margin;
-    padding: 0;
-}
-
-li {
-    list-style-type: none;
-}
-
-.parameters-list > li {
-    margin: $default-margin 0;
-}
-
-a.is-user {
-    background-color: $is-user-background-color;
-
-    &:hover {
-        background-color: $is-user-hover-background-color;
+    @media (min-width: $S) {
+        padding: $default-padding;
     }
 }
 
@@ -131,25 +158,34 @@ a.is-user {
 .proposal-timestamp {
     font-family: monospace;
     font-size: $monospace-font-size;
-    padding: $default-padding $default-padding $default-padding 0;
+    padding: $small-padding $small-padding $small-padding 0;
+
+    @media (min-width: $S) {
+        padding: $default-padding $default-padding $default-padding 0;
+    }
 }
 
 .proposal-description {
+    min-width: 20em;
     margin: 0;
-    padding: $default-padding;
+    padding: $small-padding;
     border-left: $default-border;
+
+    @media (min-width: $S) {
+        padding: $default-padding;
+    }
 }
 
 .proposal-id {
     display: inline-block;
     font-family: monospace;
     font-size: $monospace-font-size;
+    background-color: $proposal-id-background-color;
     min-width: 4em;
+    padding: 0 $small-padding;
+    margin-right: $small-margin;
     border: $default-border;
     border-radius: $border-radius;
-    padding: 0 $small-padding;
-    background-color: $proposal-id-background-color;
-    margin-right: $small-margin;
     text-align: center;
 }
 
@@ -167,6 +203,7 @@ details {
         padding: $default-padding;
         border: $default-border;
         border-radius: $border-radius;
+        overflow: hidden;
     }
 
     td:first-child {
@@ -195,8 +232,8 @@ details {
     font-family: monospace;
     font-size: $monospace-font-size;
     line-height: 1.4;
-    background-color: white;
     color: $general-text-color;
+    background-color: white;
     margin: $default-margin 0 0 0;
     padding: $default-padding;
     border: $default-border;
@@ -205,8 +242,31 @@ details {
     word-break: break-word;
 }
 
+.form-input {
+    max-width: $form-max-width;
+
+    input {
+        margin: $small-margin 0;
+    }
+
+    textarea {
+         margin-top: $small-margin;
+    }
+}
+
 input[type=file] {
     background-color: white;
+}
+
+input[type=number] {
+    width: 13ch;
+    text-align: right;
+}
+
+textarea {
+    width: 100%;
+    min-height: 10em;
+    resize: none;
 }
 
 @media (min-width: $S) {
@@ -242,44 +302,18 @@ input[type=file] {
     }
 }
 
-select {
-    cursor: pointer;
-    background-color: white;
-    text-align: right;
-    
-    option {
-        padding: 0 3em;
-    }
-}
-
-.form-input {
-    margin: $default-margin 0;
-
-    input, select {
-        margin: $small-margin 0;
-    }
-
-    textarea {
-         margin-top: $small-margin;
-    }
-}
-
-input[type=number] {
-    width: 13ch;
-    text-align: right;
-}
-
-textarea {
-    width: 100%;
-    min-height: 10em;
-    resize: none;
-}
-
 .ipfs-link {
+    font-family: monospace;
+    font-size: $monospace-font-size;
     word-break: break-word;
 }
 
 .message-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width:100%;
+    height: 100%;
     background-color: $message-background-color;
 }
 

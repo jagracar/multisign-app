@@ -23,7 +23,7 @@ export function App() {
 export function MultisignParameters() {
     return (
         <main>
-            <h1>Your multisign / mini-DAO</h1>
+            <h1>Tezos multisign / mini-DAO</h1>
             <ContractSelectionForm />
             <Parameters />
         </main>
