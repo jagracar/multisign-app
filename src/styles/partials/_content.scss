@@ -2,19 +2,85 @@
  * Content styling
  */
 
-.content-container {
-    max-width: $L;
-    margin: auto;
-    padding: $default-padding;
+html, body, #root, .app-container {
+    height: 100%;
+}
+
+ul {
+    margin: 0;
+    padding: 0;
+
+    @media (min-width: $S) {
+        margin: $default-margin 0 $default-margin $big-margin;
+    }
+}
+
+li {
+    list-style-type: none;
+}
+
+h1 {
+    margin: $small-margin 0.2em;
+}
+
+p {
+    max-width: $text-max-width;
+}
+
+.header-container {
+    padding: $small-padding;
+
+    @media (min-width: $S) {
+        padding: $default-padding;
+    }
+}
+
+nav {
+    ul {
+        margin: 0;
+        padding: 0;
+
+        @media (min-width: $S) {
+            margin-left: $small-padding;
+        }
+    }
+
+    li {
+        display: inline-block;
+        margin: 0 $small-margin $small-margin 0;
+    }
+
+    a {
+        display: inline-block;
+        color: $header-color;
+
+        &:hover, &:focus, &.active {
+            color: $header-color;
+            border-bottom: $default-border;
+            text-decoration: none;
+        }
+    }
+}
+
+main {
+    padding: 0 $small-padding;
+
+    @media (min-width: $S) {
+        padding: 0 $default-padding;
+    }
 }
 
 footer {
     background-color: $footer-background-color;
     border-top: $default-border;
     padding: 0 $default-padding;
+
+    @media (min-width: $S) {
+        padding: 0 $big-padding;
+    }
 }
 
-button, input, select, .proposal-votes, .users-list a {
+button, input, .users-list a, .proposal-votes {
     display: inline-block;
     font-family: monospace;
     font-size: $monospace-font-size;
@@ -23,7 +89,6 @@ button, input, select, .proposal-votes, .users-list a {
     padding: $small-padding;
     border: $default-border;
     border-radius: $border-radius;
-    word-break: break-word;
 }
 
 button, input[type=submit], .users-list a {
@@ -36,29 +101,20 @@ button, input[type=submit], .users-list a {
     }
 }
 
-.tezos-address {
-    font-family: monospace;
-    font-size: $monospace-font-size;
-}
-
-section {
-    background-color: $section-background-color;
-    padding: $default-padding;
-    border: $default-border;
-    border-radius: $big-border-radius;
-}
-
-ul {
-    margin: $default-margin $big-margin;
-    padding: 0;
-}
-
-li {
-    list-style-type: none;
-}
-
 .parameters-list > li {
     margin: $default-margin 0;
+
+    &:last-child {
+        margin-bottom: $small-margin;
+    }
+}
+
+.users-list {
+    margin: $default-margin 0;
+
+    a {
+        word-break: break-word;
+    }
 }
 
 a.is-user {
@@ -69,37 +125,89 @@ a.is-user {
     }
 }
 
-.proposal-list {
-    max-height: 50em;
-    margin-bottom: $big-margin;
-    overflow: auto;
+.tezos-address {
+    font-family: monospace;
+    font-size: $monospace-font-size;
+}
 
-    &:last-child {
-        margin-bottom: $default-margin;
+section {
+    background-color: $section-background-color;
+    margin-bottom: $default-margin;
+    padding: $small-padding;
+    border: $default-border;
+    border-radius: $big-border-radius;
+
+    @media (min-width: $S) {
+        padding: $default-padding;
     }
 }
 
-.proposal {
-    padding: 0.2em 0;
+.proposal-list {
+    max-height: 50em;
+    overflow: auto;
 
-    &:not(:last-child) {
-        border-bottom: $default-border;
+    & > li {
+        padding: 0.2em 0;
+
+        &:not(:last-child) {
+            border-bottom: $default-border;
+        }
     }
 }
 
 .proposal-timestamp {
     font-family: monospace;
     font-size: $monospace-font-size;
-    padding: $default-padding $default-padding $default-padding 0;
+    padding: $small-padding $small-padding $small-padding 0;
+
+    @media (min-width: $S) {
+        padding: $default-padding $default-padding $default-padding 0;
+    }
 }
 
 .proposal-description {
+    min-width: 20em;
     margin: 0;
-    padding: $default-padding;
+    padding: $small-padding;
     border-left: $default-border;
 
-    p:first-child {
-        margin-top: 0;
+    @media (min-width: $S) {
+        padding: $default-padding;
+    }
+}
+
+.proposal-id {
+    display: inline-block;
+    font-family: monospace;
+    font-size: $monospace-font-size;
+    background-color: $proposal-id-background-color;
+    min-width: 4em;
+    padding: 0 $small-padding;
+    margin-right: $small-margin;
+    border: $default-border;
+    border-radius: $border-radius;
+    text-align: center;
+}
+
+details {
+    margin-top: $default-margin;
+
+    summary {
+        cursor: pointer;
+    }
+
+    table {
+        display: inline-block;
+        background-color: white;
+        margin: $small-margin 0 0 0;
+        padding: $default-padding;
+        border: $default-border;
+        border-radius: $border-radius;
+        overflow: hidden;
+    }
+
+    td:first-child {
+        text-align: right;
     }
 }
 
@@ -120,16 +228,12 @@ a.is-user {
     background-color: $no-vote-background-color;
 }
 
-summary {
-    cursor: pointer;
-}
-
 .micheline-code {
     font-family: monospace;
     font-size: $monospace-font-size;
     line-height: 1.4;
-    background-color: white;
     color: $general-text-color;
+    background-color: white;
     margin: $default-margin 0 0 0;
     padding: $default-padding;
     border: $default-border;
@@ -138,35 +242,20 @@ summary {
     word-break: break-word;
 }
 
-form {
-    margin: $big-margin 0;
+.form-input {
+    max-width: $form-max-width;
 
-    &:last-child {
-        margin-bottom: $default-margin;
+    input {
+        margin: $small-margin 0;
+    }
+
+    textarea {
+         margin-top: $small-margin;
     }
 }
 
-fieldset {
-    padding: $big-padding;
-    border: $default-border;
-    border-radius: $border-radius;
-}
-
-.tezos-wallet-input {
-    width: 38ch;
-}
-
-.token-contract-input {
-    width: 41ch;
-}
-
-select {
-    cursor: pointer;
+input[type=file] {
     background-color: white;
-}
-
-input, select, textarea {
-    margin: $small-margin 0;
 }
 
 input[type=number] {
@@ -180,13 +269,57 @@ textarea {
     resize: none;
 }
 
+@media (min-width: $S) {
+    .tezos-wallet-input {
+        width: 38ch;
+    }
+
+    .contract-address-input {
+        width: 41ch;
+    }
+}
+
+.transfers-input {
+    margin: $default-margin 0;
+
+    &:first-child {
+        margin-top: $small-margin;
+    }
+}
+
+.transfer-input {
+    margin: $default-margin 0;
+    padding: $default-padding;
+    border: $default-border;
+    border-radius: $border-radius;
+
+    &:first-child {
+        margin-top: 0;
+    }
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
+
+.ipfs-link {
+    font-family: monospace;
+    font-size: $monospace-font-size;
+    word-break: break-word;
+}
+
 .message-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width:100%;
+    height: 100%;
     background-color: $message-background-color;
 }
 
 .message {
     background-color: $section-background-color;
-    min-width: 20em;
+    min-width: 30%;
     max-width: 80%;
     min-height: 10em;
     padding: $big-padding;

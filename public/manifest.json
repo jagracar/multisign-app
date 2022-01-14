@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Mutisign",
+  "name": "Multisign / mini-DAO",
   "icons": [
     {
       "src": "favicon.ico",

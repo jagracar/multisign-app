@@ -3,7 +3,8 @@ import { Parser, emitMicheline } from '@taquito/michel-codec';
 import { encodePubKey } from '@taquito/utils';
 import { MultisignContext } from '../context';
 import { Button } from '../button';
-import { TzktLink, TezosAddressLink } from '../link';
+import { TezosAddressLink, TokenLink, IpfsLink } from '../link';
+import { tokens, hexToString } from '../utils';
 
 
 export function Proposals() {
@@ -44,18 +45,22 @@ export function Proposals() {
     }
 
     return (
-        <section>
-            <h2>Proposals</h2>
+        <>
+            <section>
+                <h2>Active proposals</h2>
+                <ProposalList proposals={activeProposals} canVote={context.storage?.users.includes(context.activeAccount?.address)} />
+            </section>
 
-            <h3>Active proposals</h3>
-            <ProposalList proposals={activeProposals} canVote={context.storage?.users.includes(context.activeAccount?.address)} />
+            <section>
+                <h2>Executed proposals</h2>
+                <ProposalList proposals={executedProposals} />
+            </section>
 
-            <h3>Executed proposals</h3>
-            <ProposalList proposals={executedProposals} />
-
-            <h3>Expired proposals</h3>
-            <ProposalList proposals={expiredProposals} />
-        </section>
+            <section>
+                <h2>Expired proposals</h2>
+                <ProposalList proposals={expiredProposals} />
+            </section>
+        </>
     );
 }
 
@@ -69,7 +74,7 @@ function ProposalList(props) {
     return (
         <ul className='proposal-list'>
             {props.proposals.map((proposal) => (
-                <li key={proposal.key} className='proposal'>
+                <li key={proposal.key}>
                     <Proposal
                         proposalId={proposal.key}
                         proposal={proposal.value}
@@ -85,17 +90,19 @@ function ProposalList(props) {
 
 function Proposal(props) {
     return (
-        <>
+        <div className='proposal'>
             <ProposalTimestamp timestamp={props.proposal.timestamp} />
-            <ProposalDescription proposal={props.proposal} />
+            <ProposalDescription
+                id={props.proposalId}
+                proposal={props.proposal} />
             <ProposalExtraInformation
-                proposalId={props.proposalId}
+                id={props.proposalId}
                 vote={props.vote}
                 positiveVotes={props.proposal.positive_votes}
                 voteProposal={props.voteProposal}
                 executeProposal={props.executeProposal}
             />
-        </>
+        </div>
     );
 }
 
@@ -106,84 +113,175 @@ function ProposalTimestamp(props) {
 }
 
 function ProposalDescription(props) {
-    // Write a different proposal description depending of the proposal type
+    return (
+        <div className='proposal-description'>
+            <ProposalId id={props.id} />
+            <ProposalDescriptionIntro issuer={props.proposal.issuer} />
+            {' '}
+            <ProposalDescriptionContent proposal={props.proposal} />
+        </div>
+    );
+}
+
+function ProposalId(props) {
+    return (
+        <span className='proposal-id'>#{props.id}</span>
+    );
+}
+
+function ProposalDescriptionIntro(props) {
+    return (
+        <span>
+            <TezosAddressLink address={props.issuer} useAlias shorten /> proposed to
+        </span>
+    );
+}
+
+function ProposalDescriptionContent(props) {
+    // Write a different proposal description depending of the proposal kind
     const proposal = props.proposal;
-    const kind = proposal.type;
-    const issuer = proposal.issuer;
+    const kind = proposal.kind;
 
-    if (kind === 'text') {
+    if (kind.hasOwnProperty('text')) {
         return (
-            <p className='proposal-description'>
-                <TezosAddressLink address={issuer} shorten /> proposed to approve the following text...
-            </p>
+            <span>
+                approve a <IpfsLink path={proposal.text? hexToString(proposal.text).split('/')[2] : ''}>text proposal</IpfsLink>.
+            </span>
         );
     }
 
-    if (kind === 'transfer_mutez') {
+    if (kind.hasOwnProperty('transfer_mutez')) {
+        // Extract the transfers information
+        const transfers = proposal.mutez_transfers;
+        const nTransfers = transfers.length;
+        const totalAmount = transfers.reduce((previous, current) => previous + parseInt(current.amount), 0);
+
+        if (nTransfers === 1) {
+            return (
+                <span>
+                    transfer {transfers[0].amount / 1000000} ꜩ to <TezosAddressLink address={transfers[0].destination} useAlias shorten />.
+                </span>
+            );
+        } else {
+            return (
+                <>
+                    <span>
+                        transfer {totalAmount / 1000000} ꜩ.
+                    </span>
+                    <details>
+                        <summary>See transfer details</summary>
+                        <table>
+                            <tbody>
+                                {transfers.map((transfer, index) => (
+                                    <tr key={index}>
+                                        <td>
+                                            {transfer.amount / 1000000} ꜩ to
+                                        </td>
+                                        <td>
+                                            <TezosAddressLink address={transfer.destination} useAlias shorten />
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </details>
+                </>
+            );
+        }
+    }
+
+    if (kind.hasOwnProperty('transfer_token')) {
+        // Extract the transfers information
+        const fa2 = proposal.token_transfers.fa2;
+        const tokenId = proposal.token_transfers.token_id;
+        const transfers = proposal.token_transfers.distribution;
+        const nTransfers = transfers.length;
+        const nEditions = transfers.reduce((previous, current) => previous + parseInt(current.amount), 0);
+        const token = tokens.find(token => token.fa2 === fa2);
+
+        if (nTransfers === 1) {
+            return (
+                <span>
+                    transfer {transfers[0].amount}
+                    {' '}
+                    {token?.multiasset? `edition${transfers[0].amount > 1? 's' : ''} of token` : ''}
+                    {' '}
+                    <TokenLink fa2={fa2} id={tokenId}>
+                        {token? (token.multiasset? '#' + tokenId : token.name) : 'tokens'}
+                    </TokenLink>
+                    {' '}
+                    to <TezosAddressLink address={transfers[0].destination} useAlias shorten />.
+                </span>
+            );
+        } else {
+            return (
+                <>
+                    <span>
+                        transfer {nEditions}
+                        {' '}
+                        {token?.multiasset? 'editions of token' : ''}
+                        {' '}
+                        <TokenLink fa2={fa2} id={tokenId}>
+                            {token? (token.multiasset? '#' + tokenId : token.name) : 'tokens'}
+                        </TokenLink>.
+                    </span>
+                    <details>
+                        <summary>See transfer details</summary>
+                        <table>
+                            <tbody>
+                                {transfers.map((transfer, index) => (
+                                    <tr key={index}>
+                                        <td>
+                                            {transfer.amount}
+                                            {' '}
+                                            {token?.multiasset? `edition${transfer.amount > 1? 's' : ''}` : ''} to
+                                        </td>
+                                        <td>
+                                            <TezosAddressLink address={transfer.destination} useAlias shorten />
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </details>
+                </>
+            );            
+        }
+    }
+
+    if (kind.hasOwnProperty('add_user')) {
         return (
-            <p className='proposal-description'>
-                <TezosAddressLink address={issuer} shorten /> proposed to transfer {proposal.mutez_amount/1000000} ꜩ to
-                {' '}
-                <TezosAddressLink address={proposal.destination} shorten />.
-            </p>
+            <span>
+                add <TezosAddressLink address={proposal.user}  shorten /> to the multisign.
+            </span>
         );
     }
 
-    if (kind === 'transfer_token') {
+    if (kind.hasOwnProperty('remove_user')) {
         return (
-            <p className='proposal-description'>
-                <TezosAddressLink address={issuer} shorten /> proposed to transfer
-                {' '}
-                {proposal.token_amount} edition{proposal.token_amount > 1? 's' : ''} of token
-                {' '}
-                <TzktLink address={proposal.token_contract} className='tezos-address'>
-                    #{proposal.token_id}
-                </TzktLink> to
-                {' '}
-                <TezosAddressLink address={proposal.destination} shorten />.
-            </p>
+            <span>
+                remove <TezosAddressLink address={proposal.user} useAlias shorten /> from the multisign.
+            </span>
         );
     }
 
-    if (kind === 'add_user') {
+    if (kind.hasOwnProperty('minimum_votes')) {
         return (
-            <p className='proposal-description'>
-                <TezosAddressLink address={issuer} shorten /> proposed to add
-                {' '}
-                <TezosAddressLink address={proposal.user} shorten /> to the multisign.
-            </p>
+            <span>
+                change the minimum positive votes required to approve a proposal to {proposal.minimum_votes} votes.
+            </span>
         );
     }
 
-    if (kind === 'remove_user') {
+    if (kind.hasOwnProperty('expiration_time')) {
         return (
-            <p className='proposal-description'>
-                <TezosAddressLink address={issuer} shorten /> proposed to remove
-                {' '}
-                <TezosAddressLink address={proposal.user} shorten /> from the multisign.
-            </p>
+            <span>
+                change the proposals expiration time to {proposal.expiration_time} days.
+            </span>
         );
     }
 
-    if (kind === 'minimum_votes') {
-        return (
-            <p className='proposal-description'>
-                <TezosAddressLink address={issuer} shorten /> proposed to change the
-                minimum positive votes required to approve a proposal to {proposal.minimum_votes} votes.
-            </p>
-        );
-    }
-
-    if (kind === 'expiration_time') {
-        return (
-            <p className='proposal-description'>
-                <TezosAddressLink address={issuer} shorten /> proposed to change the
-                proposals expiration time to {proposal.expiration_time} days.
-            </p>
-        );
-    }
-
-    if (kind === 'lambda') {
+    if (kind.hasOwnProperty('lambda_function')) {
         // Transform the lambda function Michelson JSON code to Micheline code
         const parser = new Parser();
         const michelsonCode = parser.parseJSON(JSON.parse(proposal.lambda_function));
@@ -196,16 +294,17 @@ function ProposalDescription(props) {
         );
 
         return (
-            <div className='proposal-description'>
-                <p><TezosAddressLink address={issuer} shorten /> proposed to execute a lambda function.</p>
-
+            <>
+                <span>
+                    execute a lambda function.
+                </span>
                 <details>
                     <summary>See Micheline code</summary>
                     <pre className='micheline-code'>
                         {encodedMichelineCode}
                     </pre>
                 </details>
-            </div>
+            </>
         );
     }
 
@@ -223,17 +322,17 @@ function ProposalExtraInformation(props) {
     return (
         <div className='proposal-extra-information'>
             {props.executeProposal &&
-                <Button text='execute' onClick={() => props.executeProposal(props.proposalId)} />
+                <Button text='execute' onClick={() => props.executeProposal(props.id)} />
             }
 
             <span className={'proposal-votes' + voteClassName}>{props.positiveVotes}</span>
 
             {props.voteProposal &&
-                <Button text='YES' onClick={() => props.voteProposal(props.proposalId, true)} />
+                <Button text='YES' onClick={() => props.voteProposal(props.id, true)} />
             }
 
             {props.voteProposal &&
-                <Button text='NO' onClick={() => props.voteProposal(props.proposalId, false)} />
+                <Button text='NO' onClick={() => props.voteProposal(props.id, false)} />
             }
         </div>
     );

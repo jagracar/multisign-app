@@ -2,44 +2,46 @@
  * General layout
  */
 
-html, body, #root, .app-container {
-    width: 100%;
-    height: 100%;
-}
-
 // 1st flexbox group
 .app-container {
     display: flex;
     flex-direction: column;
 }
 
-// 2nd flexbox group
-.content-container {
-    display: flex;
-    flex-direction: column;
-    gap: $default-gap;
+main {
+    flex: 1 1 auto;
 }
 
-// 3rd flexbox group
+@media (min-width: $L) {
+    main, header {
+        width: $L;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    footer > p {
+        
+    }
+}
+
+// 2nd flexbox group
 .header-container {
     display: flex;
     flex-direction: row;
-    flex-wrap: wrap;
     justify-content: space-between;
-    align-items: flex-start;
-    column-gap: $default-gap;
+    align-items: baseline;
+    row-gap: $default-gap;
 }
 
-// 4th flexbox group
+// 3rd flexbox group
 .sync-container {
     display: flex;
     flex-direction: row;
-    justify-content: flex-end;
     align-items: baseline;
     gap: $small-gap;
 }
 
-// 5th flexbox group
+// 4th flexbox group
 .users-list {
     display: flex;
     flex-direction: row;
@@ -48,56 +50,46 @@ html, body, #root, .app-container {
     gap: $small-gap;
 }
 
-// 6th flexbox group
+// 5th flexbox group
 .proposal {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    justify-content: flex-start;
     align-items: baseline;
-}
-
-.proposal-timestamp {
-    flex: 0 0 auto;
 }
 
 .proposal-description {
     flex: 1 1 0;
-    min-width: 20em;
 }
 
-.proposal-extra-information {
-    flex: 0 0 auto;
-}
-
-// 7th flexbox group
+// 6th flexbox group
 .proposal-extra-information {
     display: flex;
     flex-direction: row;
-    justify-content: flex-end;
     gap: $small-gap;
 }
 
-// 8th flexbox group
-fieldset {
+// 7th flexbox group
+form {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     flex-wrap: wrap;
-    align-items: baseline;
+    align-items: flex-start;
     gap: $default-gap;
+
+    @media (min-width: $M) {
+        flex-direction: row;
+        align-items: flex-end;
+        justify-content: space-between;
+    }
 }
 
-.proposal-input {
+.form-input {
     flex: 1 1 auto;
 }
 
-// 9th flexbox group
+// 8th flexbox group
 .message-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width:100%;
-    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;

@@ -8,11 +8,13 @@ $general-text-color: lighten(black, 20%);
 $header-color: lighten(black, 40%);
 $link-color: lighten(blue, 20%);
 $footer-background-color: darken(white, 2%);
+$navlink-background-color: darken(white, 6%);
 $section-background-color: darken(white, 2%);
 $button-background-color: darken(white, 6%);
 $button-hover-background-color: darken(white, 10%);
 $is-user-background-color: lighten(green, 60%);
 $is-user-hover-background-color: lighten(green, 50%);
+$proposal-id-background-color: white;
 $vote-background-color: white;
 $yes-vote-background-color: lighten(green, 60%);
 $no-vote-background-color: lighten(red, 30%);
@@ -30,6 +32,8 @@ $big-margin: 2em;
 $border-radius: 4px;
 $big-border-radius: 10px;
 $monospace-font-size: 1.1em;
+$text-max-width: 1000px;
+$form-max-width: 1000px;
 
 // Complex variables
 $default-border: 1px solid darken(white, 30%);
