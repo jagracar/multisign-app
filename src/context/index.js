@@ -13,10 +13,10 @@ import { ConfirmationMessage, ErrorMessage } from '../messages';
 const multisigContractJsonFile = require('../contract/multisignContract.json');
 
 // Define the default network and multisign contract address
-//const defaultNetwork = 'mainnet';
-//const defaultContractAddress = 'KT1RtYAfoiFNkgZxQJmkSAEyQitfEQHyX3Cb';
-const defaultNetwork = 'hangzhounet';
-const defaultContractAddress = 'KT1QCio2f431gyHYLGumux955YwK4KiUmogn';
+const defaultNetwork = 'mainnet';
+const defaultContractAddress = 'KT1RtYAfoiFNkgZxQJmkSAEyQitfEQHyX3Cb';
+//const defaultNetwork = 'hangzhounet';
+//const defaultContractAddress = 'KT1QCio2f431gyHYLGumux955YwK4KiUmogn';
 
 // Clear the multisign local storage if the stored network does not coincide with the default
 if (window.localStorage.multisignNetwork !== defaultNetwork) {
