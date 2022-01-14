@@ -39,11 +39,28 @@ export function ContractSelectionForm() {
                         />
                         <datalist id='multisignContracts'>
                             <option value=''></option>
-                            <option value='KT1RtYAfoiFNkgZxQJmkSAEyQitfEQHyX3Cb'>test multising 1</option>
+                            {context.contractAddresses?.map((address, index) => (
+                                <option key={index} value={address}>test multising {context.contractAddresses.length - index}</option>
+                            ))}
                         </datalist>
                     </label>
                     <input type='submit' value='load' />
                 </form>
+            </section>
+        </>
+    );
+}
+
+export function OriginateMultisignForm() {
+    // Get the multisign context
+    const context = useContext(MultisignContext);
+
+    return (
+        <>
+            <section>
+                <h2>Multisign configuration</h2>
+                <p>Use this form to define the initial parameters of your new multisign / mini-DAO.</p>
+                <Button text='originate' onClick={context.originate} />
             </section>
         </>
     );

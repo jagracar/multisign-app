@@ -3,7 +3,7 @@ import { Outlet } from 'react-router-dom';
 import { MultisignContextProvider } from './context';
 import { Header } from './header';
 import { Footer } from './footer';
-import { ContractSelectionForm, CreateProposalForms } from './forms';
+import { ContractSelectionForm, CreateProposalForms, OriginateMultisignForm } from './forms';
 import { Parameters } from './parameters';
 import { Proposals } from './proposals';
 
@@ -44,6 +44,15 @@ export function CreateProposals() {
         <main>
             <h1>Create new proposals</h1>
             <CreateProposalForms />
+        </main>
+    );
+}
+
+export function OriginateMultisign() {
+    return (
+        <main>
+            <h1>Originate a new multisign</h1>
+            <OriginateMultisignForm />
         </main>
     );
 }

@@ -12,9 +12,20 @@ import { ConfirmationMessage, ErrorMessage } from '../messages';
 // Load the multisign smart contrac code in JSON format
 const multisigContractJsonFile = require('../contract/multisignContract.json');
 
-// Define some of the main connection parameters
-const multisignContractAddress = 'KT1RtYAfoiFNkgZxQJmkSAEyQitfEQHyX3Cb';
-const network = 'mainnet';
+// Define the default network and multisign contract address
+//const defaultNetwork = 'mainnet';
+//const defaultContractAddress = 'KT1RtYAfoiFNkgZxQJmkSAEyQitfEQHyX3Cb';
+const defaultNetwork = 'hangzhounet';
+const defaultContractAddress = 'KT1QCio2f431gyHYLGumux955YwK4KiUmogn';
+
+// Clear the multisign local storage if the stored network does not coincide with the default
+if (window.localStorage.multisignNetwork !== defaultNetwork) {
+    window.localStorage.removeItem('multisignNetwork');
+    window.localStorage.removeItem('multisignContractAddress');
+}
+
+// Set the connection parameters
+const network = window.localStorage.multisignNetwork || defaultNetwork;
 const rpcNode = `https://${network}.api.tez.ie`;
 
 // Initialize the tezos toolkit
@@ -39,6 +50,23 @@ export class MultisignContextProvider extends React.Component {
         // Pass the properties to the base class
         super(props);
 
+        // Sets the multisign contract addresses that are similar to the default contract
+        this.setContractAddresses = async () => {
+            // Send a query to tzkt to get all the multisign contract addresses
+            console.log('Querying tzKt to get the multisign contract addresses...');
+            const response = await axios.get(`https://api.${this.state.network}.tzkt.io/v1/contracts/${this.state.contractAddress}/similar`, {
+                    params: {
+                        select: 'address',
+                    }
+                })
+                .catch((error) => console.log('Error while querying the multisign contract addresses:', error));
+
+            // Update the component state
+            this.setState({
+                contractAddresses: response?.data.reverse()
+            });
+        };
+
         // Sets the current active account
         this.setActiveAccount = async () => {
             // Get the current active account
@@ -50,8 +78,6 @@ export class MultisignContextProvider extends React.Component {
             this.setState({
                 activeAccount: activeAccount
             });
-
-            console.log('Active account updated');
         };
 
         // Sets the multisign contract balance
@@ -65,8 +91,6 @@ export class MultisignContextProvider extends React.Component {
             this.setState({
                 balance: response?.data
             });
-
-            console.log('Contract balance updated');
         };
 
         // Sets the multisign contract storage
@@ -80,17 +104,22 @@ export class MultisignContextProvider extends React.Component {
             this.setState({
                 storage: response?.data
             });
-
-            console.log('Contract storage updated');
         };
 
         // Sets the multisign user aliases
         this.setUserAliases = async () => {
             // Check if the contract storage is defined
             if (this.state.storage) {
-                // Send a query to tzkt to get the user aliases
+                // Send a query to tzkt to get the user aliases from the H=N registries bigmap
                 console.log('Querying tzKt to get the user aliases...');
-                const response = await axios.get(`https://api.${this.state.network}.tzkt.io/v1/bigmaps/3919/keys?key.in=${this.state.storage.users.join(',')}`)
+                const response = await axios.get(`https://api.${this.state.network}.tzkt.io/v1/bigmaps/3919/keys`, {
+                        params: {
+                            'key.in': this.state.storage.users.join(','),
+                            limit: 10000,
+                            active: true,
+                            select: 'key,value',
+                        }
+                    })
                     .catch((error) => console.log('Error while querying the user aliases:', error));
 
                 // Rearange the user aliases in a dictionary
@@ -107,8 +136,6 @@ export class MultisignContextProvider extends React.Component {
                     userAliases: undefined
                 });
             }
-
-            console.log('User aliases updated');
         };
 
         // Sets the multisign proposals
@@ -136,8 +163,6 @@ export class MultisignContextProvider extends React.Component {
                     proposals: undefined
                 });
             }
-
-            console.log('Multisign proposals updated');
         };
 
         // Sets the votes from the active account
@@ -170,8 +195,6 @@ export class MultisignContextProvider extends React.Component {
                     userVotes: undefined
                 });
             }
-
-            console.log('User votes updated');
         };
 
         // Sets the multisign contract reference
@@ -185,8 +208,6 @@ export class MultisignContextProvider extends React.Component {
             this.setState({
                 contract: contract
             });
-
-            console.log('Contract reference updated');
         };
 
         // Sets the confirmation message
@@ -232,9 +253,9 @@ export class MultisignContextProvider extends React.Component {
                 .catch((error) => console.log('Error while originating the contract:', error));
 
             console.log('Waiting for confirmation of origination...');
-            const c = await originationOp.contract();
+            const c = await originationOp?.contract();
 
-            console.log(`Origination completed for ${c.address}.`);
+            console.log(`Origination completed for ${c?.address}.`);
             return c;
         };
 
@@ -244,7 +265,10 @@ export class MultisignContextProvider extends React.Component {
             network: network,
 
             // The multisign contract address
-            contractAddress: multisignContractAddress,
+            contractAddress: window.localStorage.multisignContractAddress || defaultContractAddress,
+
+            // The list with all the available multisign contracts addresses
+            contractAddresses: undefined,
 
             // The current active account
             activeAccount: undefined,
@@ -274,16 +298,19 @@ export class MultisignContextProvider extends React.Component {
             errorMessage: undefined,
 
             // Sets the multisign contract address
-            setContractAddress: async (contractAddress) => {
+            setContractAddress: async (address) => {
+                // Return if the contract address didn't change
+                if (address === this.state.contractAddress) return;
+
                 // Return if the contract address is not a proper address
-                if (!(contractAddress && validateAddress(contractAddress) === 3)) {
-                    this.setErrorMessage(`The provided address is not a valid contract address: ${contractAddress}`);
+                if (!(address && validateAddress(address) === 3)) {
+                    this.setErrorMessage(`The provided address is not a valid contract address: ${address}`);
                     return;
                 }
 
                 // Update the contract address and reset other contract variables
                 this.setState({
-                    contractAddress: contractAddress,
+                    contractAddress: address,
                     balance: undefined,
                     storage: undefined,
                     userAliases: undefined,
@@ -291,20 +318,13 @@ export class MultisignContextProvider extends React.Component {
                     userVotes: undefined,
                     contract: undefined
                 });
-
-                // Update all the multisign data
-                await this.setBalance();
-                await this.setStorage();
-                await this.setUserAliases();
-                await this.setProposals();
-                await this.setUserVotes();
             },
 
             // Connects the user wallet if it was not connected before
             connectWallet: async () => {
                 // Ask the user for the permission to use the wallet
                 console.log('Connecting the user wallet...');
-                await wallet.requestPermissions({network: {type: this.state.network, rpcUrl: rpcNode}})
+                await wallet.requestPermissions({network : {type: this.state.network, rpcUrl: rpcNode}})
                     .catch((error) => console.log('Error while requesting wallet permissions:', error));
 
                 // Set the active account state
@@ -318,7 +338,7 @@ export class MultisignContextProvider extends React.Component {
             disconnectWallet: async () => {
                 // Clear the active account
                 console.log('Disconnecting the user wallet...');
-                await wallet.client.clearActiveAccount();
+                await wallet.clearActiveAccount();
 
                 // Reset the active account, the user votes and the contract reference as undefined
                 this.setState({
@@ -630,7 +650,7 @@ export class MultisignContextProvider extends React.Component {
                     counter: 0,
                     expiration_time: 5,
                     metadata: metadataBigmap,
-                    minimum_votes: 4,
+                    minimum_votes: 1,
                     proposals: new MichelsonMap(),
                     users: [
                         'tz1gnL9CeM5h5kRzWZztFYLypCNnVQZjndBN',
@@ -646,12 +666,29 @@ export class MultisignContextProvider extends React.Component {
 
     componentDidMount() {
         // Initialize all the relevant information in the correct order
+        this.setContractAddresses();
         this.setActiveAccount()
             .then(() => this.setBalance())
             .then(() => this.setStorage())
             .then(() => this.setUserAliases())
             .then(() => this.setProposals())
             .then(() => this.setUserVotes());
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        // Update all the multisign data if the contract address changed
+        if (prevState.contractAddress !== this.state.contractAddress) {
+            // Update all the multisign data
+            this.setBalance()
+                .then(() => this.setStorage())
+                .then(() => this.setUserAliases())
+                .then(() => this.setProposals())
+                .then(() => this.setUserVotes());
+
+            // Update the local storage
+            window.localStorage.multisignNetwork = this.state.network;
+            window.localStorage.multisignContractAddress = this.state.contractAddress;
+        }
     }
 
     render() {
