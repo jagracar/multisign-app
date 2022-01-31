@@ -51,7 +51,7 @@ export function CreateProposals() {
 export function OriginateMultisign() {
     return (
         <main>
-            <h1>Originate a new multisign</h1>
+            <h1>Create a new multisign</h1>
             <OriginateMultisignForm />
         </main>
     );

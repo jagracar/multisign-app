@@ -15,7 +15,7 @@ export function ContractSelectionForm() {
     // Define the on submit handler
     const handleSubmit = async (e) => {
         e.preventDefault();
-        await context.setContractAddress(contractAddress);
+        context.setContractAddress(contractAddress);
      };
 
     return (
@@ -55,12 +55,118 @@ export function OriginateMultisignForm() {
     // Get the multisign context
     const context = useContext(MultisignContext);
 
+    // Set the component state
+    const [name, setName] = useState('My new multising');
+    const [users, setUsers] = useState(['', '']);
+    const [minimumVotes, setMinimumVotes] = useState(1);
+    const [expirationTime, setExpirationTime] = useState(5);
+
+    // Define the on change handler
+    const handleChange = (index, value) => {
+        // Create a new users array
+        const newUsers = users.map((user, i) => (i === index)? value : user);
+
+        // Update the component state
+        setUsers(newUsers);
+    };
+
+    // Define the on click handler
+    const handleClick = (e, increase) => {
+        e.preventDefault();
+
+        // Create a new users array
+        const newUsers = users.slice();
+
+        // Add or remove a user from the list
+        if (increase) {
+            newUsers.push('');
+        } else if (newUsers.length > 1) {
+            newUsers.pop();
+        }
+
+        // Update the component state
+        if (!increase && newUsers.length < minimumVotes) {
+            setMinimumVotes(newUsers.length);
+        }
+
+        setUsers(newUsers);
+    };
+
+    // Define the on submit handler
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        context.originate({
+            name: name,
+            users: users,
+            minimumVotes: minimumVotes,
+            expirationTime: expirationTime
+        });
+     };
+
     return (
         <>
             <section>
                 <h2>Multisign configuration</h2>
-                <p>Use this form to define the initial parameters of your new multisign / mini-DAO.</p>
-                <Button text='originate' onClick={context.originate} />
+                <p>Use this form to define the parameters of your new multisign / mini-DAO. The origination cost will be a bit more than 2 ꜩ.</p>
+                <form onSubmit={handleSubmit}>
+                    <div className='form-input'>
+                        <label>Name:
+                            {' '}
+                            <input
+                                type='text'
+                                spellCheck='false'
+                                minLength='1'
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                            />
+                        </label>
+                        <br />
+                        <label className='users-input'>Multisign users:
+                            <div className='users-input-container'>
+                                {users.map((user, index) => (
+                                    <label key={index} className='user-input'>User address:
+                                        {' '}
+                                        <input
+                                            type='text'
+                                            spellCheck='false'
+                                            minLength='36'
+                                            maxLength='36'
+                                            className='tezos-wallet-input'
+                                            value={user}
+                                            onChange={(e) => handleChange(index, e.target.value)}
+                                        />
+                                    </label>
+                                ))}
+                            </div>
+                            <Button text='+' onClick={(e) => handleClick(e, true)} />
+                            {' '}
+                            <Button text='-' onClick={(e) => handleClick(e, false)} />
+                        </label>
+                        <label>Minimum number of positive votes to approve a proposal:
+                            {' '}
+                            <input
+                                type='number'
+                                min='1'
+                                max={users.length}
+                                step='1'
+                                value={minimumVotes}
+                                onChange={(e) => setMinimumVotes(e.target.value)}
+                            />
+                        </label>
+                        <br />
+                        <label>Proposals expiration time (days):
+                            {' '}
+                            <input
+                                type='number'
+                                min='1'
+                                step='1'
+                                value={expirationTime}
+                                onChange={(e) => setExpirationTime(e.target.value)}
+                            />
+                        </label>
+                    </div>
+                    <input type='submit' value='originate' />
+                </form>
             </section>
         </>
     );
@@ -123,7 +229,7 @@ export function CreateProposalForms() {
                     decide on a dog name, buy bread at the bakery). The text will be stored in IPFS for archival purposes.
                 </p>
                 <TextProposalForm
-                    uploadToIpfs={context.uploadToIpfs}
+                    uploadFileToIpfs={context.uploadFileToIpfs}
                     handleSubmit={context.createTextProposal}
                 />
             </section>
@@ -460,7 +566,7 @@ function TextProposalForm(props) {
         e.preventDefault();
 
         // Update the component state
-        setIpfsPath(await props.uploadToIpfs(file));
+        setIpfsPath(await props.uploadFileToIpfs(file, true));
     };
 
     // Define the on submit handler

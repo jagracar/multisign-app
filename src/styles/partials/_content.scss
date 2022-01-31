@@ -279,7 +279,25 @@ textarea {
     }
 }
 
+.users-input {
+    display: block;
+    margin: $default-margin 0;
+}
+
+.users-input-container {
+    display: block;
+    margin: $default-margin 0;
+    padding: $default-padding;
+    border: $default-border;
+    border-radius: $border-radius;
+}
+
+.user-input {
+    display: block;
+}
+
 .transfers-input {
+    display: block;
     margin: $default-margin 0;
 
     &:first-child {
@@ -288,6 +306,7 @@ textarea {
 }
 
 .transfer-input {
+    display: block;
     margin: $default-margin 0;
     padding: $default-padding;
     border: $default-border;
@@ -317,7 +336,7 @@ textarea {
     background-color: $message-background-color;
 }
 
-.message {
+.information-message, .confirmation-message, .error-message {
     background-color: $section-background-color;
     min-width: 30%;
     max-width: 80%;

@@ -27,6 +27,11 @@ export function Navigation() {
                 <li>
                     <NavLink to='/create'>Create proposals</NavLink>
                 </li>
+                {false &&
+                    <li>
+                        <NavLink to='/originate'>New multisign</NavLink>
+                    </li>
+                }
             </ul>
         </nav>
     );

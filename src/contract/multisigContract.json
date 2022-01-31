@@ -282,16 +282,7 @@
                           { "prim": "GET", "args": [ { "int": "5" } ] },
                           { "prim": "SENDER" },
                           { "prim": "MEM" },
-                          {
-                            "prim": "IF",
-                            "args": [
-                              [],
-                              [
-                                { "prim": "PUSH", "args": [ { "prim": "string" }, { "string": "This can only be executed by one of the wallet users" } ] },
-                                { "prim": "FAILWITH" }
-                              ]
-                            ]
-                          },
+                          { "prim": "IF", "args": [ [], [ { "prim": "PUSH", "args": [ { "prim": "string" }, { "string": "MS_NOT_USER" } ] }, { "prim": "FAILWITH" } ] ] },
                           { "prim": "SWAP" },
                           { "prim": "DUP" },
                           { "prim": "DUG", "args": [ { "int": "2" } ] },
@@ -300,13 +291,7 @@
                           { "prim": "DUP" },
                           { "prim": "DUG", "args": [ { "int": "2" } ] },
                           { "prim": "MEM" },
-                          {
-                            "prim": "IF",
-                            "args": [
-                              [ { "prim": "PUSH", "args": [ { "prim": "string" }, { "string": "The proposed address is in the users list" } ] }, { "prim": "FAILWITH" } ],
-                              []
-                            ]
-                          },
+                          { "prim": "IF", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "string" }, { "string": "MS_ALREADY_USER" } ] }, { "prim": "FAILWITH" } ], [] ] },
                           { "prim": "SWAP" },
                           { "prim": "DUP" },
                           { "prim": "DUG", "args": [ { "int": "2" } ] },
@@ -400,16 +385,7 @@
                           { "prim": "GET", "args": [ { "int": "5" } ] },
                           { "prim": "SENDER" },
                           { "prim": "MEM" },
-                          {
-                            "prim": "IF",
-                            "args": [
-                              [],
-                              [
-                                { "prim": "PUSH", "args": [ { "prim": "string" }, { "string": "This can only be executed by one of the wallet users" } ] },
-                                { "prim": "FAILWITH" }
-                              ]
-                            ]
-                          },
+                          { "prim": "IF", "args": [ [], [ { "prim": "PUSH", "args": [ { "prim": "string" }, { "string": "MS_NOT_USER" } ] }, { "prim": "FAILWITH" } ] ] },
                           { "prim": "SWAP" },
                           { "prim": "DUP" },
                           { "prim": "DUG", "args": [ { "int": "2" } ] },
@@ -421,7 +397,7 @@
                           { "prim": "MEM" },
                           {
                             "prim": "IF",
-                            "args": [ [], [ { "prim": "PUSH", "args": [ { "prim": "string" }, { "string": "The proposal doesn't exist" } ] }, { "prim": "FAILWITH" } ] ]
+                            "args": [ [], [ { "prim": "PUSH", "args": [ { "prim": "string" }, { "string": "MS_INEXISTENT_PROPOSAL" } ] }, { "prim": "FAILWITH" } ] ]
                           },
                           { "prim": "SWAP" },
                           { "prim": "DUP" },
@@ -432,12 +408,9 @@
                           { "prim": "DUP" },
                           { "prim": "DUG", "args": [ { "int": "2" } ] },
                           { "prim": "GET" },
-                          { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "150" } ] }, { "prim": "FAILWITH" } ], [] ] },
+                          { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "197" } ] }, { "prim": "FAILWITH" } ], [] ] },
                           { "prim": "GET", "args": [ { "int": "3" } ] },
-                          {
-                            "prim": "IF",
-                            "args": [ [ { "prim": "PUSH", "args": [ { "prim": "string" }, { "string": "The proposal has been executed" } ] }, { "prim": "FAILWITH" } ], [] ]
-                          },
+                          { "prim": "IF", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "string" }, { "string": "MS_EXECUTED_PROPOSAL" } ] }, { "prim": "FAILWITH" } ], [] ] },
                           { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "60" } ] },
                           { "prim": "DUP" },
                           { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "24" } ] },
@@ -453,50 +426,45 @@
                           { "prim": "CDR" },
                           { "prim": "DUP", "args": [ { "int": "3" } ] },
                           { "prim": "GET" },
-                          { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "150" } ] }, { "prim": "FAILWITH" } ], [] ] },
+                          { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "197" } ] }, { "prim": "FAILWITH" } ], [] ] },
                           { "prim": "GET", "args": [ { "int": "7" } ] },
                           { "prim": "ADD" },
                           { "prim": "NOW" },
                           { "prim": "COMPARE" },
                           { "prim": "GT" },
-                          {
-                            "prim": "IF",
-                            "args": [ [ { "prim": "PUSH", "args": [ { "prim": "string" }, { "string": "The proposal has expired" } ] }, { "prim": "FAILWITH" } ], [] ]
-                          },
+                          { "prim": "IF", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "string" }, { "string": "MS_EXPIRED_PROPOSAL" } ] }, { "prim": "FAILWITH" } ], [] ] },
                           { "prim": "SWAP" },
                           { "prim": "DUP" },
+                          { "prim": "DUG", "args": [ { "int": "2" } ] },
+                          { "prim": "GET", "args": [ { "int": "3" } ] },
+                          { "prim": "CDR" },
+                          { "prim": "SWAP" },
+                          { "prim": "DUP" },
+                          { "prim": "DUG", "args": [ { "int": "2" } ] },
+                          { "prim": "GET" },
+                          { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "488" } ] }, { "prim": "FAILWITH" } ], [] ] },
+                          { "prim": "DUP", "args": [ { "int": "3" } ] },
                           { "prim": "GET", "args": [ { "int": "3" } ] },
                           { "prim": "CAR" },
                           { "prim": "SWAP" },
                           { "prim": "DUP" },
-                          { "prim": "DUG", "args": [ { "int": "3" } ] },
-                          { "prim": "GET", "args": [ { "int": "3" } ] },
-                          { "prim": "CDR" },
-                          { "prim": "DUP", "args": [ { "int": "3" } ] },
-                          { "prim": "GET" },
-                          { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "367" } ] }, { "prim": "FAILWITH" } ], [] ] },
+                          { "prim": "DUG", "args": [ { "int": "2" } ] },
                           { "prim": "GET", "args": [ { "int": "11" } ] },
                           { "prim": "COMPARE" },
                           { "prim": "GE" },
-                          {
-                            "prim": "IF",
-                            "args": [
-                              [],
-                              [ { "prim": "PUSH", "args": [ { "prim": "string" }, { "string": "The proposal didn't receive enough positive votes" } ] }, { "prim": "FAILWITH" } ]
-                            ]
-                          },
-                          { "prim": "SWAP" },
+                          { "prim": "IF", "args": [ [], [ { "prim": "PUSH", "args": [ { "prim": "string" }, { "string": "MS_NOT_EXECUTABLE" } ] }, { "prim": "FAILWITH" } ] ] },
+                          { "prim": "DIG", "args": [ { "int": "2" } ] },
                           { "prim": "UNPAIR" },
                           { "prim": "SWAP" },
                           { "prim": "UNPAIR" },
                           { "prim": "UNPAIR" },
                           { "prim": "SWAP" },
                           { "prim": "DUP" },
-                          { "prim": "DUP", "args": [ { "int": "6" } ] },
+                          { "prim": "DIG", "args": [ { "int": "6" } ] },
                           { "prim": "DUP" },
                           { "prim": "DUG", "args": [ { "int": "2" } ] },
                           { "prim": "GET" },
-                          { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "372" } ] }, { "prim": "FAILWITH" } ], [] ] },
+                          { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "493" } ] }, { "prim": "FAILWITH" } ], [] ] },
                           { "prim": "PUSH", "args": [ { "prim": "bool" }, { "prim": "True" } ] },
                           { "prim": "UPDATE", "args": [ { "int": "3" } ] },
                           { "prim": "SOME" },
@@ -507,15 +475,8 @@
                           { "prim": "PAIR" },
                           { "prim": "SWAP" },
                           { "prim": "PAIR" },
-                          { "prim": "DUP" },
-                          { "prim": "DUG", "args": [ { "int": "2" } ] },
-                          { "prim": "GET", "args": [ { "int": "3" } ] },
-                          { "prim": "CDR" },
                           { "prim": "SWAP" },
                           { "prim": "DUP" },
-                          { "prim": "DUG", "args": [ { "int": "2" } ] },
-                          { "prim": "GET" },
-                          { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "367" } ] }, { "prim": "FAILWITH" } ], [] ] },
                           { "prim": "CAR" },
                           {
                             "prim": "IF_LEFT",
@@ -544,15 +505,11 @@
                             "prim": "IF",
                             "args": [
                               [
-                                { "prim": "NIL", "args": [ { "prim": "operation" } ] },
-                                { "prim": "DUP", "args": [ { "int": "3" } ] },
-                                { "prim": "GET", "args": [ { "int": "3" } ] },
-                                { "prim": "CDR" },
-                                { "prim": "DUP", "args": [ { "int": "3" } ] },
-                                { "prim": "GET" },
-                                { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "367" } ] }, { "prim": "FAILWITH" } ], [] ] },
+                                { "prim": "DUP" },
                                 { "prim": "GET", "args": [ { "int": "13" } ] },
-                                { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "375" } ] }, { "prim": "FAILWITH" } ], [] ] },
+                                { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "496" } ] }, { "prim": "FAILWITH" } ], [] ] },
+                                { "prim": "NIL", "args": [ { "prim": "operation" } ] },
+                                { "prim": "SWAP" },
                                 {
                                   "prim": "ITER",
                                   "args": [
@@ -561,7 +518,7 @@
                                       { "prim": "DUG", "args": [ { "int": "2" } ] },
                                       { "prim": "CDR" },
                                       { "prim": "CONTRACT", "args": [ { "prim": "unit" } ] },
-                                      { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "376" } ] }, { "prim": "FAILWITH" } ], [] ] },
+                                      { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "497" } ] }, { "prim": "FAILWITH" } ], [] ] },
                                       { "prim": "DIG", "args": [ { "int": "2" } ] },
                                       { "prim": "CAR" },
                                       { "prim": "UNIT" },
@@ -574,12 +531,9 @@
                               [ { "prim": "NIL", "args": [ { "prim": "operation" } ] } ]
                             ]
                           },
-                          { "prim": "DUP", "args": [ { "int": "3" } ] },
-                          { "prim": "GET", "args": [ { "int": "3" } ] },
-                          { "prim": "CDR" },
-                          { "prim": "DUP", "args": [ { "int": "3" } ] },
-                          { "prim": "GET" },
-                          { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "367" } ] }, { "prim": "FAILWITH" } ], [] ] },
+                          { "prim": "SWAP" },
+                          { "prim": "DUP" },
+                          { "prim": "DUG", "args": [ { "int": "2" } ] },
                           { "prim": "CAR" },
                           {
                             "prim": "IF_LEFT",
@@ -612,14 +566,9 @@
                                   "prim": "NIL",
                                   "args": [ { "prim": "pair", "args": [ { "prim": "address" }, { "prim": "pair", "args": [ { "prim": "nat" }, { "prim": "nat" } ] } ] } ]
                                 },
-                                { "prim": "DUP", "args": [ { "int": "4" } ] },
-                                { "prim": "GET", "args": [ { "int": "3" } ] },
-                                { "prim": "CDR" },
-                                { "prim": "DUP", "args": [ { "int": "4" } ] },
-                                { "prim": "GET" },
-                                { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "367" } ] }, { "prim": "FAILWITH" } ], [] ] },
+                                { "prim": "DUP", "args": [ { "int": "3" } ] },
                                 { "prim": "GET", "args": [ { "int": "15" } ] },
-                                { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "380" } ] }, { "prim": "FAILWITH" } ], [] ] },
+                                { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "501" } ] }, { "prim": "FAILWITH" } ], [] ] },
                                 { "prim": "GET", "args": [ { "int": "4" } ] },
                                 {
                                   "prim": "ITER",
@@ -628,14 +577,9 @@
                                       { "prim": "DUP" },
                                       { "prim": "DUG", "args": [ { "int": "2" } ] },
                                       { "prim": "CAR" },
-                                      { "prim": "DUP", "args": [ { "int": "6" } ] },
-                                      { "prim": "GET", "args": [ { "int": "3" } ] },
-                                      { "prim": "CDR" },
-                                      { "prim": "DUP", "args": [ { "int": "6" } ] },
-                                      { "prim": "GET" },
-                                      { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "367" } ] }, { "prim": "FAILWITH" } ], [] ] },
+                                      { "prim": "DUP", "args": [ { "int": "5" } ] },
                                       { "prim": "GET", "args": [ { "int": "15" } ] },
-                                      { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "380" } ] }, { "prim": "FAILWITH" } ], [] ] },
+                                      { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "501" } ] }, { "prim": "FAILWITH" } ], [] ] },
                                       { "prim": "GET", "args": [ { "int": "3" } ] },
                                       { "prim": "DIG", "args": [ { "int": "3" } ] },
                                       { "prim": "CDR" },
@@ -645,14 +589,9 @@
                                   ]
                                 },
                                 { "prim": "SWAP" },
-                                { "prim": "DUP", "args": [ { "int": "4" } ] },
-                                { "prim": "GET", "args": [ { "int": "3" } ] },
-                                { "prim": "CDR" },
-                                { "prim": "DUP", "args": [ { "int": "4" } ] },
-                                { "prim": "GET" },
-                                { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "367" } ] }, { "prim": "FAILWITH" } ], [] ] },
+                                { "prim": "DUP", "args": [ { "int": "3" } ] },
                                 { "prim": "GET", "args": [ { "int": "15" } ] },
-                                { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "380" } ] }, { "prim": "FAILWITH" } ], [] ] },
+                                { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "501" } ] }, { "prim": "FAILWITH" } ], [] ] },
                                 { "prim": "CAR" },
                                 {
                                   "prim": "CONTRACT",
@@ -684,7 +623,7 @@
                                   ],
                                   "annots": [ "%transfer" ]
                                 },
-                                { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "503" } ] }, { "prim": "FAILWITH" } ], [] ] },
+                                { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "702" } ] }, { "prim": "FAILWITH" } ], [] ] },
                                 { "prim": "PUSH", "args": [ { "prim": "mutez" }, { "int": "0" } ] },
                                 {
                                   "prim": "NIL",
@@ -711,12 +650,9 @@
                               []
                             ]
                           },
-                          { "prim": "DUP", "args": [ { "int": "3" } ] },
-                          { "prim": "GET", "args": [ { "int": "3" } ] },
-                          { "prim": "CDR" },
-                          { "prim": "DUP", "args": [ { "int": "3" } ] },
-                          { "prim": "GET" },
-                          { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "367" } ] }, { "prim": "FAILWITH" } ], [] ] },
+                          { "prim": "SWAP" },
+                          { "prim": "DUP" },
+                          { "prim": "DUG", "args": [ { "int": "2" } ] },
                           { "prim": "CAR" },
                           {
                             "prim": "IF_LEFT",
@@ -753,39 +689,23 @@
                                 { "prim": "SWAP" },
                                 { "prim": "ITER", "args": [ [ { "prim": "CONS" } ] ] },
                                 { "prim": "SIZE" },
-                                { "prim": "DUP", "args": [ { "int": "4" } ] },
-                                { "prim": "GET", "args": [ { "int": "3" } ] },
-                                { "prim": "CDR" },
-                                { "prim": "DUP", "args": [ { "int": "4" } ] },
-                                { "prim": "GET" },
-                                { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "367" } ] }, { "prim": "FAILWITH" } ], [] ] },
+                                { "prim": "DUP", "args": [ { "int": "3" } ] },
                                 { "prim": "GET", "args": [ { "int": "17" } ] },
-                                { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "391" } ] }, { "prim": "FAILWITH" } ], [] ] },
+                                { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "512" } ] }, { "prim": "FAILWITH" } ], [] ] },
                                 { "prim": "COMPARE" },
                                 { "prim": "LE" },
                                 {
                                   "prim": "IF",
-                                  "args": [
-                                    [],
-                                    [
-                                      { "prim": "PUSH", "args": [ { "prim": "string" }, { "string": "The minimum_votes parameter cannot be higher than the number of users" } ] },
-                                      { "prim": "FAILWITH" }
-                                    ]
-                                  ]
+                                  "args": [ [], [ { "prim": "PUSH", "args": [ { "prim": "string" }, { "string": "MS_WRONG_MINIMUM_VOTES" } ] }, { "prim": "FAILWITH" } ] ]
                                 },
-                                { "prim": "DUP", "args": [ { "int": "3" } ] },
+                                { "prim": "DIG", "args": [ { "int": "2" } ] },
                                 { "prim": "UNPAIR" },
                                 { "prim": "SWAP" },
                                 { "prim": "UNPAIR" },
                                 { "prim": "CDR" },
-                                { "prim": "DIG", "args": [ { "int": "5" } ] },
-                                { "prim": "GET", "args": [ { "int": "3" } ] },
-                                { "prim": "CDR" },
-                                { "prim": "DUP", "args": [ { "int": "6" } ] },
-                                { "prim": "GET" },
-                                { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "367" } ] }, { "prim": "FAILWITH" } ], [] ] },
+                                { "prim": "DUP", "args": [ { "int": "5" } ] },
                                 { "prim": "GET", "args": [ { "int": "17" } ] },
-                                { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "391" } ] }, { "prim": "FAILWITH" } ], [] ] },
+                                { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "514" } ] }, { "prim": "FAILWITH" } ], [] ] },
                                 { "prim": "PAIR" },
                                 { "prim": "PAIR" },
                                 { "prim": "SWAP" },
@@ -795,12 +715,9 @@
                               []
                             ]
                           },
-                          { "prim": "DUP", "args": [ { "int": "3" } ] },
-                          { "prim": "GET", "args": [ { "int": "3" } ] },
-                          { "prim": "CDR" },
-                          { "prim": "DUP", "args": [ { "int": "3" } ] },
-                          { "prim": "GET" },
-                          { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "367" } ] }, { "prim": "FAILWITH" } ], [] ] },
+                          { "prim": "SWAP" },
+                          { "prim": "DUP" },
+                          { "prim": "DUG", "args": [ { "int": "2" } ] },
                           { "prim": "CAR" },
                           {
                             "prim": "IF_LEFT",
@@ -829,19 +746,14 @@
                             "prim": "IF",
                             "args": [
                               [
-                                { "prim": "DUP", "args": [ { "int": "3" } ] },
+                                { "prim": "DIG", "args": [ { "int": "2" } ] },
                                 { "prim": "UNPAIR" },
                                 { "prim": "UNPAIR" },
                                 { "prim": "SWAP" },
                                 { "prim": "CDR" },
-                                { "prim": "DIG", "args": [ { "int": "5" } ] },
-                                { "prim": "GET", "args": [ { "int": "3" } ] },
-                                { "prim": "CDR" },
-                                { "prim": "DUP", "args": [ { "int": "6" } ] },
-                                { "prim": "GET" },
-                                { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "367" } ] }, { "prim": "FAILWITH" } ], [] ] },
+                                { "prim": "DUP", "args": [ { "int": "5" } ] },
                                 { "prim": "GET", "args": [ { "int": "19" } ] },
-                                { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "396" } ] }, { "prim": "FAILWITH" } ], [] ] },
+                                { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "517" } ] }, { "prim": "FAILWITH" } ], [] ] },
                                 { "prim": "PAIR" },
                                 { "prim": "SWAP" },
                                 { "prim": "PAIR" },
@@ -851,12 +763,9 @@
                               []
                             ]
                           },
-                          { "prim": "DUP", "args": [ { "int": "3" } ] },
-                          { "prim": "GET", "args": [ { "int": "3" } ] },
-                          { "prim": "CDR" },
-                          { "prim": "DUP", "args": [ { "int": "3" } ] },
-                          { "prim": "GET" },
-                          { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "367" } ] }, { "prim": "FAILWITH" } ], [] ] },
+                          { "prim": "SWAP" },
+                          { "prim": "DUP" },
+                          { "prim": "DUG", "args": [ { "int": "2" } ] },
                           { "prim": "CAR" },
                           {
                             "prim": "IF_LEFT",
@@ -885,18 +794,13 @@
                             "prim": "IF",
                             "args": [
                               [
-                                { "prim": "DUP", "args": [ { "int": "3" } ] },
+                                { "prim": "DIG", "args": [ { "int": "2" } ] },
                                 { "prim": "DUP" },
                                 { "prim": "GET", "args": [ { "int": "5" } ] },
                                 { "prim": "PUSH", "args": [ { "prim": "bool" }, { "prim": "True" } ] },
-                                { "prim": "DIG", "args": [ { "int": "5" } ] },
-                                { "prim": "GET", "args": [ { "int": "3" } ] },
-                                { "prim": "CDR" },
-                                { "prim": "DUP", "args": [ { "int": "6" } ] },
-                                { "prim": "GET" },
-                                { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "367" } ] }, { "prim": "FAILWITH" } ], [] ] },
+                                { "prim": "DUP", "args": [ { "int": "5" } ] },
                                 { "prim": "GET", "args": [ { "int": "21" } ] },
-                                { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "399" } ] }, { "prim": "FAILWITH" } ], [] ] },
+                                { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "520" } ] }, { "prim": "FAILWITH" } ], [] ] },
                                 { "prim": "UPDATE" },
                                 { "prim": "UPDATE", "args": [ { "int": "5" } ] },
                                 { "prim": "DUG", "args": [ { "int": "2" } ] }
@@ -904,12 +808,9 @@
                               []
                             ]
                           },
-                          { "prim": "DUP", "args": [ { "int": "3" } ] },
-                          { "prim": "GET", "args": [ { "int": "3" } ] },
-                          { "prim": "CDR" },
-                          { "prim": "DUP", "args": [ { "int": "3" } ] },
-                          { "prim": "GET" },
-                          { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "367" } ] }, { "prim": "FAILWITH" } ], [] ] },
+                          { "prim": "SWAP" },
+                          { "prim": "DUP" },
+                          { "prim": "DUG", "args": [ { "int": "2" } ] },
                           { "prim": "CAR" },
                           {
                             "prim": "IF_LEFT",
@@ -949,22 +850,14 @@
                                 { "prim": "SIZE" },
                                 { "prim": "COMPARE" },
                                 { "prim": "GT" },
-                                {
-                                  "prim": "IF",
-                                  "args": [ [], [ { "prim": "PUSH", "args": [ { "prim": "string" }, { "string": "The last user cannot be removed" } ] }, { "prim": "FAILWITH" } ] ]
-                                },
-                                { "prim": "DUP", "args": [ { "int": "3" } ] },
+                                { "prim": "IF", "args": [ [], [ { "prim": "PUSH", "args": [ { "prim": "string" }, { "string": "MS_LAST_USER" } ] }, { "prim": "FAILWITH" } ] ] },
+                                { "prim": "DIG", "args": [ { "int": "2" } ] },
                                 { "prim": "DUP" },
                                 { "prim": "GET", "args": [ { "int": "5" } ] },
                                 { "prim": "PUSH", "args": [ { "prim": "bool" }, { "prim": "False" } ] },
-                                { "prim": "DIG", "args": [ { "int": "5" } ] },
-                                { "prim": "GET", "args": [ { "int": "3" } ] },
-                                { "prim": "CDR" },
-                                { "prim": "DUP", "args": [ { "int": "6" } ] },
-                                { "prim": "GET" },
-                                { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "367" } ] }, { "prim": "FAILWITH" } ], [] ] },
+                                { "prim": "DUP", "args": [ { "int": "5" } ] },
                                 { "prim": "GET", "args": [ { "int": "21" } ] },
-                                { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "399" } ] }, { "prim": "FAILWITH" } ], [] ] },
+                                { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "525" } ] }, { "prim": "FAILWITH" } ], [] ] },
                                 { "prim": "UPDATE" },
                                 { "prim": "UPDATE", "args": [ { "int": "5" } ] },
                                 { "prim": "DUG", "args": [ { "int": "2" } ] },
@@ -1011,12 +904,9 @@
                               []
                             ]
                           },
-                          { "prim": "DUP", "args": [ { "int": "3" } ] },
-                          { "prim": "GET", "args": [ { "int": "3" } ] },
-                          { "prim": "CDR" },
-                          { "prim": "DUP", "args": [ { "int": "3" } ] },
-                          { "prim": "GET" },
-                          { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "367" } ] }, { "prim": "FAILWITH" } ], [] ] },
+                          { "prim": "SWAP" },
+                          { "prim": "DUP" },
+                          { "prim": "DUG", "args": [ { "int": "2" } ] },
                           { "prim": "CAR" },
                           {
                             "prim": "IF_LEFT",
@@ -1045,14 +935,9 @@
                             "prim": "IF",
                             "args": [
                               [
-                                { "prim": "DUP", "args": [ { "int": "3" } ] },
-                                { "prim": "GET", "args": [ { "int": "3" } ] },
-                                { "prim": "CDR" },
-                                { "prim": "DIG", "args": [ { "int": "2" } ] },
-                                { "prim": "GET" },
-                                { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "367" } ] }, { "prim": "FAILWITH" } ], [] ] },
+                                { "prim": "SWAP" },
                                 { "prim": "GET", "args": [ { "int": "22" } ] },
-                                { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "411" } ] }, { "prim": "FAILWITH" } ], [] ] },
+                                { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "532" } ] }, { "prim": "FAILWITH" } ], [] ] },
                                 { "prim": "UNIT" },
                                 { "prim": "EXEC" },
                                 { "prim": "ITER", "args": [ [ { "prim": "CONS" } ] ] }
@@ -1072,16 +957,7 @@
                                 { "prim": "GET", "args": [ { "int": "5" } ] },
                                 { "prim": "SENDER" },
                                 { "prim": "MEM" },
-                                {
-                                  "prim": "IF",
-                                  "args": [
-                                    [],
-                                    [
-                                      { "prim": "PUSH", "args": [ { "prim": "string" }, { "string": "This can only be executed by one of the wallet users" } ] },
-                                      { "prim": "FAILWITH" }
-                                    ]
-                                  ]
-                                },
+                                { "prim": "IF", "args": [ [], [ { "prim": "PUSH", "args": [ { "prim": "string" }, { "string": "MS_NOT_USER" } ] }, { "prim": "FAILWITH" } ] ] },
                                 { "prim": "DUP" },
                                 { "prim": "PUSH", "args": [ { "prim": "nat" }, { "int": "1" } ] },
                                 { "prim": "SWAP" },
@@ -1089,13 +965,7 @@
                                 { "prim": "GE" },
                                 {
                                   "prim": "IF",
-                                  "args": [
-                                    [],
-                                    [
-                                      { "prim": "PUSH", "args": [ { "prim": "string" }, { "string": "The expiration_time parameter cannot be smaller than 1 day" } ] },
-                                      { "prim": "FAILWITH" }
-                                    ]
-                                  ]
+                                  "args": [ [], [ { "prim": "PUSH", "args": [ { "prim": "string" }, { "string": "MS_WRONG_EXPIRATION_TIME" } ] }, { "prim": "FAILWITH" } ] ]
                                 },
                                 { "prim": "SWAP" },
                                 { "prim": "DUP" },
@@ -1181,16 +1051,7 @@
                                 { "prim": "GET", "args": [ { "int": "5" } ] },
                                 { "prim": "SENDER" },
                                 { "prim": "MEM" },
-                                {
-                                  "prim": "IF",
-                                  "args": [
-                                    [],
-                                    [
-                                      { "prim": "PUSH", "args": [ { "prim": "string" }, { "string": "This can only be executed by one of the wallet users" } ] },
-                                      { "prim": "FAILWITH" }
-                                    ]
-                                  ]
-                                },
+                                { "prim": "IF", "args": [ [], [ { "prim": "PUSH", "args": [ { "prim": "string" }, { "string": "MS_NOT_USER" } ] }, { "prim": "FAILWITH" } ] ] },
                                 { "prim": "SWAP" },
                                 { "prim": "DUP" },
                                 { "prim": "DUG", "args": [ { "int": "2" } ] },
@@ -1293,16 +1154,7 @@
                           { "prim": "GET", "args": [ { "int": "5" } ] },
                           { "prim": "SENDER" },
                           { "prim": "MEM" },
-                          {
-                            "prim": "IF",
-                            "args": [
-                              [],
-                              [
-                                { "prim": "PUSH", "args": [ { "prim": "string" }, { "string": "This can only be executed by one of the wallet users" } ] },
-                                { "prim": "FAILWITH" }
-                              ]
-                            ]
-                          },
+                          { "prim": "IF", "args": [ [], [ { "prim": "PUSH", "args": [ { "prim": "string" }, { "string": "MS_NOT_USER" } ] }, { "prim": "FAILWITH" } ] ] },
                           { "prim": "DUP" },
                           { "prim": "PUSH", "args": [ { "prim": "nat" }, { "int": "1" } ] },
                           { "prim": "SWAP" },
@@ -1310,13 +1162,7 @@
                           { "prim": "GE" },
                           {
                             "prim": "IF",
-                            "args": [
-                              [],
-                              [
-                                { "prim": "PUSH", "args": [ { "prim": "string" }, { "string": "The minimum_votes parameter cannot be smaller than 1" } ] },
-                                { "prim": "FAILWITH" }
-                              ]
-                            ]
+                            "args": [ [], [ { "prim": "PUSH", "args": [ { "prim": "string" }, { "string": "MS_WRONG_MINIMUM_VOTES" } ] }, { "prim": "FAILWITH" } ] ]
                           },
                           { "prim": "SWAP" },
                           { "prim": "DUP" },
@@ -1406,16 +1252,7 @@
                                 { "prim": "GET", "args": [ { "int": "5" } ] },
                                 { "prim": "SENDER" },
                                 { "prim": "MEM" },
-                                {
-                                  "prim": "IF",
-                                  "args": [
-                                    [],
-                                    [
-                                      { "prim": "PUSH", "args": [ { "prim": "string" }, { "string": "This can only be executed by one of the wallet users" } ] },
-                                      { "prim": "FAILWITH" }
-                                    ]
-                                  ]
-                                },
+                                { "prim": "IF", "args": [ [], [ { "prim": "PUSH", "args": [ { "prim": "string" }, { "string": "MS_NOT_USER" } ] }, { "prim": "FAILWITH" } ] ] },
                                 { "prim": "SWAP" },
                                 { "prim": "DUP" },
                                 { "prim": "DUG", "args": [ { "int": "2" } ] },
@@ -1424,13 +1261,7 @@
                                 { "prim": "DUP" },
                                 { "prim": "DUG", "args": [ { "int": "2" } ] },
                                 { "prim": "MEM" },
-                                {
-                                  "prim": "IF",
-                                  "args": [
-                                    [],
-                                    [ { "prim": "PUSH", "args": [ { "prim": "string" }, { "string": "The proposed address is not in the users list" } ] }, { "prim": "FAILWITH" } ]
-                                  ]
-                                },
+                                { "prim": "IF", "args": [ [], [ { "prim": "PUSH", "args": [ { "prim": "string" }, { "string": "MS_WRONG_USER" } ] }, { "prim": "FAILWITH" } ] ] },
                                 { "prim": "SWAP" },
                                 { "prim": "DUP" },
                                 { "prim": "DUG", "args": [ { "int": "2" } ] },
@@ -1515,16 +1346,7 @@
                                 { "prim": "GET", "args": [ { "int": "5" } ] },
                                 { "prim": "SENDER" },
                                 { "prim": "MEM" },
-                                {
-                                  "prim": "IF",
-                                  "args": [
-                                    [],
-                                    [
-                                      { "prim": "PUSH", "args": [ { "prim": "string" }, { "string": "This can only be executed by one of the wallet users" } ] },
-                                      { "prim": "FAILWITH" }
-                                    ]
-                                  ]
-                                },
+                                { "prim": "IF", "args": [ [], [ { "prim": "PUSH", "args": [ { "prim": "string" }, { "string": "MS_NOT_USER" } ] }, { "prim": "FAILWITH" } ] ] },
                                 { "prim": "SWAP" },
                                 { "prim": "DUP" },
                                 { "prim": "DUG", "args": [ { "int": "2" } ] },
@@ -1619,16 +1441,7 @@
                           { "prim": "GET", "args": [ { "int": "5" } ] },
                           { "prim": "SENDER" },
                           { "prim": "MEM" },
-                          {
-                            "prim": "IF",
-                            "args": [
-                              [],
-                              [
-                                { "prim": "PUSH", "args": [ { "prim": "string" }, { "string": "This can only be executed by one of the wallet users" } ] },
-                                { "prim": "FAILWITH" }
-                              ]
-                            ]
-                          },
+                          { "prim": "IF", "args": [ [], [ { "prim": "PUSH", "args": [ { "prim": "string" }, { "string": "MS_NOT_USER" } ] }, { "prim": "FAILWITH" } ] ] },
                           { "prim": "SWAP" },
                           { "prim": "DUP" },
                           { "prim": "DUG", "args": [ { "int": "2" } ] },
@@ -1717,16 +1530,7 @@
                                 { "prim": "GET", "args": [ { "int": "5" } ] },
                                 { "prim": "SENDER" },
                                 { "prim": "MEM" },
-                                {
-                                  "prim": "IF",
-                                  "args": [
-                                    [],
-                                    [
-                                      { "prim": "PUSH", "args": [ { "prim": "string" }, { "string": "This can only be executed by one of the wallet users" } ] },
-                                      { "prim": "FAILWITH" }
-                                    ]
-                                  ]
-                                },
+                                { "prim": "IF", "args": [ [], [ { "prim": "PUSH", "args": [ { "prim": "string" }, { "string": "MS_NOT_USER" } ] }, { "prim": "FAILWITH" } ] ] },
                                 { "prim": "SWAP" },
                                 { "prim": "DUP" },
                                 { "prim": "DUG", "args": [ { "int": "2" } ] },
@@ -1797,16 +1601,7 @@
                                 { "prim": "GET", "args": [ { "int": "5" } ] },
                                 { "prim": "SENDER" },
                                 { "prim": "MEM" },
-                                {
-                                  "prim": "IF",
-                                  "args": [
-                                    [],
-                                    [
-                                      { "prim": "PUSH", "args": [ { "prim": "string" }, { "string": "This can only be executed by one of the wallet users" } ] },
-                                      { "prim": "FAILWITH" }
-                                    ]
-                                  ]
-                                },
+                                { "prim": "IF", "args": [ [], [ { "prim": "PUSH", "args": [ { "prim": "string" }, { "string": "MS_NOT_USER" } ] }, { "prim": "FAILWITH" } ] ] },
                                 { "prim": "SWAP" },
                                 { "prim": "DUP" },
                                 { "prim": "DUG", "args": [ { "int": "2" } ] },
@@ -1819,7 +1614,7 @@
                                 { "prim": "MEM" },
                                 {
                                   "prim": "IF",
-                                  "args": [ [], [ { "prim": "PUSH", "args": [ { "prim": "string" }, { "string": "The proposal doesn't exist" } ] }, { "prim": "FAILWITH" } ] ]
+                                  "args": [ [], [ { "prim": "PUSH", "args": [ { "prim": "string" }, { "string": "MS_INEXISTENT_PROPOSAL" } ] }, { "prim": "FAILWITH" } ] ]
                                 },
                                 { "prim": "SWAP" },
                                 { "prim": "DUP" },
@@ -1831,11 +1626,11 @@
                                 { "prim": "DUG", "args": [ { "int": "2" } ] },
                                 { "prim": "CAR" },
                                 { "prim": "GET" },
-                                { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "150" } ] }, { "prim": "FAILWITH" } ], [] ] },
+                                { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "197" } ] }, { "prim": "FAILWITH" } ], [] ] },
                                 { "prim": "GET", "args": [ { "int": "3" } ] },
                                 {
                                   "prim": "IF",
-                                  "args": [ [ { "prim": "PUSH", "args": [ { "prim": "string" }, { "string": "The proposal has been executed" } ] }, { "prim": "FAILWITH" } ], [] ]
+                                  "args": [ [ { "prim": "PUSH", "args": [ { "prim": "string" }, { "string": "MS_EXECUTED_PROPOSAL" } ] }, { "prim": "FAILWITH" } ], [] ]
                                 },
                                 { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "60" } ] },
                                 { "prim": "DUP" },
@@ -1853,7 +1648,7 @@
                                 { "prim": "DUP", "args": [ { "int": "3" } ] },
                                 { "prim": "CAR" },
                                 { "prim": "GET" },
-                                { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "150" } ] }, { "prim": "FAILWITH" } ], [] ] },
+                                { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "197" } ] }, { "prim": "FAILWITH" } ], [] ] },
                                 { "prim": "GET", "args": [ { "int": "7" } ] },
                                 { "prim": "ADD" },
                                 { "prim": "NOW" },
@@ -1861,7 +1656,7 @@
                                 { "prim": "GT" },
                                 {
                                   "prim": "IF",
-                                  "args": [ [ { "prim": "PUSH", "args": [ { "prim": "string" }, { "string": "The proposal has expired" } ] }, { "prim": "FAILWITH" } ], [] ]
+                                  "args": [ [ { "prim": "PUSH", "args": [ { "prim": "string" }, { "string": "MS_EXPIRED_PROPOSAL" } ] }, { "prim": "FAILWITH" } ], [] ]
                                 },
                                 { "prim": "SWAP" },
                                 { "prim": "DUP" },
@@ -1891,7 +1686,7 @@
                                       { "prim": "DUP" },
                                       { "prim": "DUG", "args": [ { "int": "2" } ] },
                                       { "prim": "GET" },
-                                      { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "343" } ] }, { "prim": "FAILWITH" } ], [] ] },
+                                      { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "453" } ] }, { "prim": "FAILWITH" } ], [] ] },
                                       { "prim": "PUSH", "args": [ { "prim": "nat" }, { "int": "1" } ] },
                                       { "prim": "DIG", "args": [ { "int": "8" } ] },
                                       { "prim": "GET", "args": [ { "int": "3" } ] },
@@ -1899,11 +1694,11 @@
                                       { "prim": "DUP", "args": [ { "int": "9" } ] },
                                       { "prim": "CAR" },
                                       { "prim": "GET" },
-                                      { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "340" } ] }, { "prim": "FAILWITH" } ], [] ] },
+                                      { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "450" } ] }, { "prim": "FAILWITH" } ], [] ] },
                                       { "prim": "GET", "args": [ { "int": "11" } ] },
                                       { "prim": "SUB" },
                                       { "prim": "ISNAT" },
-                                      { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "343" } ] }, { "prim": "FAILWITH" } ], [] ] },
+                                      { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "453" } ] }, { "prim": "FAILWITH" } ], [] ] },
                                       { "prim": "UPDATE", "args": [ { "int": "11" } ] },
                                       { "prim": "SOME" },
                                       { "prim": "SWAP" },
@@ -1936,7 +1731,7 @@
                                       { "prim": "DUP" },
                                       { "prim": "DUG", "args": [ { "int": "2" } ] },
                                       { "prim": "GET" },
-                                      { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "347" } ] }, { "prim": "FAILWITH" } ], [] ] },
+                                      { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "457" } ] }, { "prim": "FAILWITH" } ], [] ] },
                                       { "prim": "DUP" },
                                       { "prim": "GET", "args": [ { "int": "11" } ] },
                                       { "prim": "PUSH", "args": [ { "prim": "nat" }, { "int": "1" } ] },
@@ -2139,13 +1934,13 @@
         { "prim": "DUP" },
         { "prim": "DUG", "args": [ { "int": "2" } ] },
         { "prim": "MEM" },
-        { "prim": "IF", "args": [ [], [ { "prim": "PUSH", "args": [ { "prim": "string" }, { "string": "The provided proposal_id doesn't exist" } ] }, { "prim": "FAILWITH" } ] ] },
+        { "prim": "IF", "args": [ [], [ { "prim": "PUSH", "args": [ { "prim": "string" }, { "string": "MS_INEXISTENT_PROPOSAL" } ] }, { "prim": "FAILWITH" } ] ] },
         { "prim": "SWAP" },
         { "prim": "GET", "args": [ { "int": "3" } ] },
         { "prim": "CDR" },
         { "prim": "SWAP" },
         { "prim": "GET" },
-        { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "466" } ] }, { "prim": "FAILWITH" } ], [] ] }
+        { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "628" } ] }, { "prim": "FAILWITH" } ], [] ] }
       ]
     ]
   },
@@ -2180,12 +1975,12 @@
         { "prim": "CAR" },
         { "prim": "PAIR" },
         { "prim": "MEM" },
-        { "prim": "IF", "args": [ [], [ { "prim": "PUSH", "args": [ { "prim": "string" }, { "string": "The user didn't vote the proposal" } ] }, { "prim": "FAILWITH" } ] ] },
+        { "prim": "IF", "args": [ [], [ { "prim": "PUSH", "args": [ { "prim": "string" }, { "string": "MS_NO_USER_VOTE" } ] }, { "prim": "FAILWITH" } ] ] },
         { "prim": "SWAP" },
         { "prim": "GET", "args": [ { "int": "6" } ] },
         { "prim": "SWAP" },
         { "prim": "GET" },
-        { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "483" } ] }, { "prim": "FAILWITH" } ], [] ] }
+        { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "659" } ] }, { "prim": "FAILWITH" } ], [] ] }
       ]
     ]
   },

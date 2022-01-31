@@ -5,18 +5,18 @@ import { BeaconWallet } from '@taquito/beacon-wallet';
 import { Parser } from '@taquito/michel-codec';
 import axios from 'axios';
 import { create } from 'ipfs-http-client';
+import { Buffer } from 'buffer';
 import { stringToHex, hexToString } from '../utils';
-import { ConfirmationMessage, ErrorMessage } from '../messages';
+import { InformationMessage, ConfirmationMessage, ErrorMessage } from '../messages';
 
 
-// Load the multisign smart contrac code in JSON format
-const multisigContractJsonFile = require('../contract/multisignContract.json');
+// Load the multisign smart contrac code and metadata in JSON format
+const multisigContractCode = require('../contract/multisigContract.json');
+const multisigContractMetadata = require('../contract/multisigMetadata.json');
 
 // Define the default network and multisign contract address
 const defaultNetwork = 'mainnet';
-const defaultContractAddress = 'KT1RtYAfoiFNkgZxQJmkSAEyQitfEQHyX3Cb';
-//const defaultNetwork = 'hangzhounet';
-//const defaultContractAddress = 'KT1QCio2f431gyHYLGumux955YwK4KiUmogn';
+const defaultContractAddress = 'KT1PKBTVmdxfgkFvSeNUQacYiEFsPBw16B4P';
 
 // Clear the multisign local storage if the stored network does not coincide with the default
 if (window.localStorage.multisignNetwork !== defaultNetwork) {
@@ -40,6 +40,9 @@ const wallet = new BeaconWallet({
 // Pass the wallet to the tezos toolkit
 tezos.setWalletProvider(wallet);
 
+// Create an instance of the IPFS client
+const ipfsClient = create('https://ipfs.infura.io:5001/api/v0');
+
 // Create the multisign context
 export const MultisignContext = createContext();
 
@@ -54,7 +57,7 @@ export class MultisignContextProvider extends React.Component {
         this.setContractAddresses = async () => {
             // Send a query to tzkt to get all the multisign contract addresses
             console.log('Querying tzKt to get the multisign contract addresses...');
-            const response = await axios.get(`https://api.${this.state.network}.tzkt.io/v1/contracts/${this.state.contractAddress}/similar`, {
+            const response = await axios.get(`https://api.${this.state.network}.tzkt.io/v1/contracts/${this.state.contractAddress}/same`, {
                     params: {
                         select: 'address',
                     }
@@ -110,11 +113,19 @@ export class MultisignContextProvider extends React.Component {
         this.setUserAliases = async () => {
             // Check if the contract storage is defined
             if (this.state.storage) {
+                // Prepare the list of user wallets for the query
+                let userWallets = this.state.storage.users.join(',');
+
+                // The list needs at least two wallets, so add the same wallet again in the case of only one user
+                if (this.state.storage.users.length === 1) {
+                    userWallets += ',' + userWallets;
+                }
+
                 // Send a query to tzkt to get the user aliases from the H=N registries bigmap
                 console.log('Querying tzKt to get the user aliases...');
                 const response = await axios.get(`https://api.${this.state.network}.tzkt.io/v1/bigmaps/3919/keys`, {
                         params: {
-                            'key.in': this.state.storage.users.join(','),
+                            'key.in': userWallets,
                             limit: 10000,
                             active: true,
                             select: 'key,value',
@@ -210,9 +221,9 @@ export class MultisignContextProvider extends React.Component {
             });
         };
 
-        // Sets the confirmation message
-        this.setConfirmationMessage = (message) => this.setState({
-            confirmationMessage: message
+        // Sets the information message
+        this.setInformationMessage = (message) => this.setState({
+            informationMessage: message
         });
 
         // Sets the error message
@@ -233,8 +244,8 @@ export class MultisignContextProvider extends React.Component {
             // Return if the operation is undefined
             if (operation === undefined) return;
 
-            // Display the confirmation message
-            this.setConfirmationMessage('Waiting for the operation to be confirmed...');
+            // Display the information message
+            this.setInformationMessage('Waiting for the operation to be confirmed...');
 
             // Wait for the operation to be confirmed
             console.log('Waiting for the operation to be confirmed...');
@@ -242,21 +253,8 @@ export class MultisignContextProvider extends React.Component {
                 .then(() => console.log(`Operation confirmed: https://tzkt.io/${operation.opHash}`))
                 .catch((error) => console.log('Error while confirming the operation:', error));
 
-            // Remove the confirmation message
-            this.setConfirmationMessage(undefined);
-        };
-
-        // Originates a contract with the provided storage
-        this.originateContract = async (contract, storage) => {
-            console.log('Originating contract...');
-            const originationOp = await tezos.wallet.originate({code: contract, storage: storage}).send()
-                .catch((error) => console.log('Error while originating the contract:', error));
-
-            console.log('Waiting for confirmation of origination...');
-            const c = await originationOp?.contract();
-
-            console.log(`Origination completed for ${c?.address}.`);
-            return c;
+            // Remove the information message
+            this.setInformationMessage(undefined);
         };
 
         // Define the component state parameters
@@ -290,6 +288,9 @@ export class MultisignContextProvider extends React.Component {
 
             // The multisign contract reference
             contract: undefined,
+
+            // The information message
+            informationMessage: undefined,
 
             // The confirmation message
             confirmationMessage: undefined,
@@ -398,7 +399,7 @@ export class MultisignContextProvider extends React.Component {
                     // Check that the destination address is a valid address
                     const destination = transfer.destination;
 
-                    if (!(destination && destination !== '' && validateAddress(destination) === 3)) {
+                    if (!(destination && validateAddress(destination) === 3)) {
                         this.setErrorMessage(`The provided address is not a valid tezos address: ${destination}`);
                         return;
                     }
@@ -407,7 +408,7 @@ export class MultisignContextProvider extends React.Component {
                 }
 
                 // Check that the total amount is smaller thant the contract balance
-                if (totalAmount >= this.state.balance) {
+                if (totalAmount > this.state.balance) {
                     this.setErrorMessage('The total amount of tez to transfer is larger than the current contract balance');
                     return;
                 }
@@ -430,7 +431,7 @@ export class MultisignContextProvider extends React.Component {
                 if (!(await this.contractIsAvailable())) return;
 
                 // Check that the token contract address is a valid address
-                if (!(tokenContract && tokenContract !== '' && validateAddress(tokenContract) === 3)) {
+                if (!(tokenContract && validateAddress(tokenContract) === 3)) {
                     this.setErrorMessage(`The provided token contract address is not a valid tezos address: ${tokenContract}`);
                     return;
                 }
@@ -440,7 +441,7 @@ export class MultisignContextProvider extends React.Component {
                     // Check that the destination address is a valid address
                     const destination = transfer.destination;
 
-                    if (!(destination && destination !== '' && validateAddress(destination) === 3)) {
+                    if (!(destination && validateAddress(destination) === 3)) {
                         this.setErrorMessage(`The provided address is not a valid tezos address: ${destination}`);
                         return;
                     }
@@ -464,7 +465,7 @@ export class MultisignContextProvider extends React.Component {
                 if (!(await this.contractIsAvailable())) return;
 
                 // Check that the user address is a valid address
-                if (!(userAddress && userAddress !== '' && validateAddress(userAddress) === 3)) {
+                if (!(userAddress && validateAddress(userAddress) === 3)) {
                     this.setErrorMessage('The provided address is not a valid tezos address');
                     return;
                 }
@@ -493,7 +494,7 @@ export class MultisignContextProvider extends React.Component {
                 if (!(await this.contractIsAvailable())) return;
 
                 // Check that the user address is a valid address
-                if (!(userAddress && userAddress !== '' && validateAddress(userAddress) === 3)) {
+                if (!(userAddress && validateAddress(userAddress) === 3)) {
                     this.setErrorMessage('The provided address is not a valid tezos address');
                     return;
                 }
@@ -613,53 +614,111 @@ export class MultisignContextProvider extends React.Component {
                 await this.setProposals();
             },
 
+            // Originates a new multisign smart contract
+            originate: async (parameters) => {
+                const { name, users, minimumVotes, expirationTime } = parameters;
+
+                // Loop over the users information
+                for (const userAddress of users) {
+                    // Check that the user address is a valid address
+                    if (!(userAddress && validateAddress(userAddress) === 3)) {
+                        this.setErrorMessage(`The provided user address is not a valid tezos address: ${userAddress}`);
+                        return;
+                    }
+                }
+
+                // Check that the minimum votes are within the expected range
+                if (minimumVotes <= 0 || minimumVotes > users.length) {
+                    this.setErrorMessage('The minimum votes need to be higher than 0 and less or equal to the number of multisign users');
+                    return;
+                }
+
+                // Check that the expiration time is higher than 1 day
+                if (expirationTime <= 0) {
+                    this.setErrorMessage('The expiration time needs to be higher than 1 day');
+                    return;
+                }
+
+                // Update the contract metadata
+                multisigContractMetadata.name = name;
+
+                // Upload the contract metadata to ipfs
+                const metadataIpfsPath = await this.state.uploadMetadataToIpfs(multisigContractMetadata, false);
+                console.log(metadataIpfsPath);
+
+                // Initalize the metadata big map
+                const metadataBigmap = new MichelsonMap();
+                metadataBigmap.set('', stringToHex('ipfs://' + metadataIpfsPath));
+
+                // Initialize the contract storage
+                const storage = {
+                    counter: 0,
+                    expiration_time: parameters.expirationTime,
+                    metadata: metadataBigmap,
+                    minimum_votes: parameters.minimumVotes,
+                    proposals: new MichelsonMap(),
+                    users: parameters.users,
+                    votes: new MichelsonMap()
+                };
+
+                // Send the operation that will orininate the new multisign contract
+                console.log('Sending the new multisign origination operation...');
+                const operation = await tezos.wallet.originate({code: multisigContractCode, storage: storage}).send()
+                    .catch((error) => console.log('Error while originating the contract:', error));
+
+                // Display the information message
+                this.setInformationMessage('Waiting for the operation to be confirmed...');
+
+                // Wait for the operation to be confirmed
+                console.log('Waiting for confirmation of origination...');
+                const newContractAddress = await operation?.originationOperation()
+                    .then((op) => op.metadata.operation_result.originated_contracts[0].address)
+                    .catch((error) => console.log('Error while confirming the origination operation:', error));
+
+                // Remove the information message
+                this.setInformationMessage(undefined);
+
+                console.log(`Origination completed for ${newContractAddress}.`);
+            },
+
+            // Uploads some metadata to ipfs and returns the ipfs path
+            uploadMetadataToIpfs: async (metadata, displayUploadInformation) => {
+                // Display the information message
+                if (displayUploadInformation) this.setInformationMessage('Uploading the json metadata to ipfs...');
+
+                // Upload the metadata IPFS
+                console.log('Uploading the json metadata to ipfs...');
+                const added = await ipfsClient.add(Buffer.from(JSON.stringify(metadata)))
+                    .catch((error) => console.log('Error while uploading the json metadata to ipfs:', error));
+
+                // Remove the information message
+                if (displayUploadInformation) this.setInformationMessage(undefined);
+
+                 // Return the IPFS path
+                return added?.path;
+            },
+
             // Uploads a file to ipfs and returns the ipfs path
-            uploadToIpfs: async (file) => {
+            uploadFileToIpfs: async (file, displayUploadInformation) => {
                 // Check that the file is not undefined
                 if (!file) {
                     this.setErrorMessage('A file needs to be loaded before uploading to IPFS');
                     return;
                 }
 
-                // Create an instance of the IPFS client
-                const client = create('https://ipfs.infura.io:5001/api/v0');
-
-                // Display the confirmation message
-                this.setConfirmationMessage(`Uploading ${file.name} to ipfs...`);
+                // Display the information message
+                if (displayUploadInformation) this.setInformationMessage(`Uploading ${file.name} to ipfs...`);
 
                 // Upload the file to IPFS
                 console.log(`Uploading ${file.name} to ipfs...`);
-                const added = await client.add(file)
+                const added = await ipfsClient.add(file)
                     .catch((error) => console.log(`Error while uploading ${file.name} to ipfs:`, error));
 
-                // Remove the confirmation message
-                this.setConfirmationMessage(undefined);
+                // Remove the information message
+                if (displayUploadInformation) this.setInformationMessage(undefined);
 
                  // Return the IPFS path
                 return added?.path;
-            },
-
-            // Originates a new multisign smart contract
-            originate: async () => {
-                // Initalize the contract metadata big map
-                const metadataBigmap = new MichelsonMap();
-                metadataBigmap.set('', '697066733a2f2f516d52566b6f7053715a4c784d594b5a784e6b5a72703467385a365968706a456f6278594c544d6d4c4275795237');
-
-                // Initialize the contract storage
-                const storage = {
-                    counter: 0,
-                    expiration_time: 5,
-                    metadata: metadataBigmap,
-                    minimum_votes: 1,
-                    proposals: new MichelsonMap(),
-                    users: [
-                        'tz1gnL9CeM5h5kRzWZztFYLypCNnVQZjndBN',
-                        'tz1h9TG6uuxv2FtmE5yqMyKQqx8hkXk7NY6c'
-                    ],
-                    votes: new MichelsonMap()
-                };
-
-                await this.originateContract(multisigContractJsonFile, storage);
             },
         };
     }
@@ -694,8 +753,12 @@ export class MultisignContextProvider extends React.Component {
     render() {
         return (
             <MultisignContext.Provider value={this.state}>
+                {this.state.informationMessage &&
+                    <InformationMessage message={this.state.informationMessage} />
+                }
+
                 {this.state.confirmationMessage &&
-                    <ConfirmationMessage message={this.state.confirmationMessage} />
+                    <ConfirmationMessage message={this.state.confirmationMessage} onClick={() => this.setConfirmationMessage(undefined)} />
                 }
 
                 {this.state.errorMessage &&
