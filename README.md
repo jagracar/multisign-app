@@ -1,6 +1,6 @@
-# multisign-app
+# multisig-app
 
-A basic react app to interact with my tezos [multisign smart contract](https://github.com/jagracar/tezos-smart-contracts/blob/main/python/contracts/multisignWalletContract.py).
+A basic react app to interact with my tezos [multisig smart contract](https://github.com/jagracar/tezos-smart-contracts/blob/main/python/contracts/multisignWalletContract.py).
 
 ## Installation
 

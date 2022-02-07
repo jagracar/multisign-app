@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { NavLink } from 'react-router-dom';
-import { MultisignContext } from '../context';
+import { MultisigContext } from '../context';
 import { TezosAddressLink } from '../link';
 import { Button } from '../button';
 
@@ -29,7 +29,7 @@ export function Navigation() {
                 </li>
                 {false &&
                     <li>
-                        <NavLink to='/originate'>New multisign</NavLink>
+                        <NavLink to='/originate'>New multisig</NavLink>
                     </li>
                 }
             </ul>
@@ -38,8 +38,8 @@ export function Navigation() {
 }
 
 export function Wallet() {
-    // Get the multisign context
-    const context = useContext(MultisignContext);
+    // Get the multisig context
+    const context = useContext(MultisigContext);
 
     return (
         <div className='sync-container'>

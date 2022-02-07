@@ -1,13 +1,13 @@
 import React, { useContext, useState } from 'react';
-import { MultisignContext } from '../context';
+import { MultisigContext } from '../context';
 import { Button } from '../button';
 import { IpfsLink } from '../link';
 import { tokens } from '../utils';
 
 
 export function ContractSelectionForm() {
-    // Get the multisign context
-    const context = useContext(MultisignContext);
+    // Get the multisig context
+    const context = useContext(MultisigContext);
 
     // Set the component state
     const [contractAddress, setContractAddress] = useState(context.contractAddress);
@@ -21,14 +21,14 @@ export function ContractSelectionForm() {
     return (
         <>
             <section>
-                <h2>Deployed multisigns</h2>
-                <p>Use this form to select one of the deployed multisigns. Click the load button to access the multising information.</p>
+                <h2>Deployed multisigs</h2>
+                <p>Use this form to select one of the deployed multisigs. Click the load button to access the multisig information.</p>
                 <form onSubmit={handleSubmit}>
-                    <label className='form-input'>Multisign address:
+                    <label className='form-input'>Multisig address:
                         {' '}
                         <input
                             type='text'
-                            list='multisignContracts'
+                            list='multisigContracts'
                             spellCheck='false'
                             minLength='36'
                             maxLength='36'
@@ -37,10 +37,10 @@ export function ContractSelectionForm() {
                             onMouseDown={() => setContractAddress('')}
                             onChange={(e) => setContractAddress(e.target.value)}
                         />
-                        <datalist id='multisignContracts'>
+                        <datalist id='multisigContracts'>
                             <option value=''></option>
                             {context.contractAddresses?.map((address, index) => (
-                                <option key={index} value={address}>test multising {context.contractAddresses.length - index}</option>
+                                <option key={index} value={address}>test multisig {context.contractAddresses.length - index}</option>
                             ))}
                         </datalist>
                     </label>
@@ -51,12 +51,12 @@ export function ContractSelectionForm() {
     );
 }
 
-export function OriginateMultisignForm() {
-    // Get the multisign context
-    const context = useContext(MultisignContext);
+export function OriginateMultisigForm() {
+    // Get the multisig context
+    const context = useContext(MultisigContext);
 
     // Set the component state
-    const [name, setName] = useState('My new multising');
+    const [name, setName] = useState('My new multisig');
     const [users, setUsers] = useState(['', '']);
     const [minimumVotes, setMinimumVotes] = useState(1);
     const [expirationTime, setExpirationTime] = useState(5);
@@ -106,8 +106,8 @@ export function OriginateMultisignForm() {
     return (
         <>
             <section>
-                <h2>Multisign configuration</h2>
-                <p>Use this form to define the parameters of your new multisign / mini-DAO. The origination cost will be a bit more than 2 ꜩ.</p>
+                <h2>Multisig configuration</h2>
+                <p>Use this form to define the parameters of your new multisig / mini-DAO. The origination cost will be a bit more than 2 ꜩ.</p>
                 <form onSubmit={handleSubmit}>
                     <div className='form-input'>
                         <label>Name:
@@ -121,7 +121,7 @@ export function OriginateMultisignForm() {
                             />
                         </label>
                         <br />
-                        <label className='users-input'>Multisign users:
+                        <label className='users-input'>Multisig users:
                             <div className='users-input-container'>
                                 {users.map((user, index) => (
                                     <label key={index} className='user-input'>User address:
@@ -173,8 +173,8 @@ export function OriginateMultisignForm() {
 }
 
 export function CreateProposalForms() {
-    // Get the multisign context
-    const context = useContext(MultisignContext);
+    // Get the multisig context
+    const context = useContext(MultisigContext);
 
     // Return if the user is not connected
     if (!context.activeAccount) {
@@ -185,11 +185,11 @@ export function CreateProposalForms() {
         );
     }
 
-    // Return if the user is not one of the multisign users
+    // Return if the user is not one of the multisig users
     if (!(context.storage && context.storage.users.includes(context.activeAccount.address))) {
         return (
             <section>
-                <p>Only multisign users can create new proposals.</p>
+                <p>Only multisig users can create new proposals.</p>
             </section>
         );
     }
@@ -200,7 +200,7 @@ export function CreateProposalForms() {
                 <h2>Transfer tez proposal</h2>
                 <p>
                     Use this form to create a proposal that, if accepted, it will transfer
-                    the specified amount of tez from the multising to a list of tezos addresses.
+                    the specified amount of tez from the multisig to a list of tezos addresses.
                 </p>
                 <TransferTezProposalForm
                     handleSubmit={context.createTransferMutezProposal}
@@ -211,7 +211,7 @@ export function CreateProposalForms() {
                 <h2>Transfer token proposal</h2>
                 <p>
                     Use this form to create a proposal that, if accepted, it will transfer
-                    the specified amount of token editions from the multising to a list of tezos addresses.
+                    the specified amount of token editions from the multisig to a list of tezos addresses.
                 </p>
                 <TransferTokenProposalForm
                     handleSubmit={context.createTransferTokenProposal}
@@ -225,7 +225,7 @@ export function CreateProposalForms() {
                 </p>
                 <p>
                     This proposal has no direct consequences on the blockchain. However, if accepted and executed,
-                    it should trigger some off-chain actions by one of the multisign members (e.g. change a website UI,
+                    it should trigger some off-chain actions by one of the multisig members (e.g. change a website UI,
                     decide on a dog name, buy bread at the bakery). The text will be stored in IPFS for archival purposes.
                 </p>
                 <TextProposalForm
@@ -243,10 +243,10 @@ export function CreateProposalForms() {
                 <p>
                     This proposal could be used to administer other smart contracts of which the multsign is the admin
                     (e.g. to update some smart contract fees), or to execute entry points from other contracts (e.g. swap
-                    or collect a token, vote in anoter DAO / multisign).
+                    or collect a token, vote in anoter DAO / multisig).
                 </p>
                 <p className='create-proposal-warning'>
-                    Warning: Executing arbitrary smart contract code could compromise the multisign or have unexpected
+                    Warning: Executing arbitrary smart contract code could compromise the multisig or have unexpected
                     consequences. The lambda function code should have been revised by some trusted smart contract expert
                     before the proposal is accepted and executed.
                 </p>
@@ -258,7 +258,7 @@ export function CreateProposalForms() {
             <section>
                 <h2>Add user proposal</h2>
                 <p>
-                    Use this form to create a proposal that, if accepted, it will add a new user to the multisign.
+                    Use this form to create a proposal that, if accepted, it will add a new user to the multisig.
                 </p>
                 <p className='create-proposal-warning'>
                     Warning: The minimum number of positive votes required to approve a proposal will not be updated,
@@ -272,7 +272,7 @@ export function CreateProposalForms() {
             <section>
                 <h2>Remove user proposal</h2>
                 <p>
-                    Use this form to create a proposal that, if accepted, it will remove one of the multisign users.
+                    Use this form to create a proposal that, if accepted, it will remove one of the multisig users.
                 </p>
                 <p className='create-proposal-warning'>
                     Warning: The minimum number of votes required to approve a proposal will not be updated. Depending

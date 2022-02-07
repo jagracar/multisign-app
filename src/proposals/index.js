@@ -1,15 +1,15 @@
 import React, { useContext } from 'react';
 import { Parser, emitMicheline } from '@taquito/michel-codec';
 import { encodePubKey } from '@taquito/utils';
-import { MultisignContext } from '../context';
+import { MultisigContext } from '../context';
 import { Button } from '../button';
 import { TezosAddressLink, TokenLink, IpfsLink } from '../link';
 import { tokens, hexToString } from '../utils';
 
 
 export function Proposals() {
-    // Get the multisign context
-    const context = useContext(MultisignContext);
+    // Get the multisig context
+    const context = useContext(MultisigContext);
 
     // Separate the proposals between executed, expired and active proposals
     const executedProposals = [];
@@ -65,8 +65,8 @@ export function Proposals() {
 }
 
 function ProposalList(props) {
-    // Get the multisign context
-    const context = useContext(MultisignContext);
+    // Get the multisig context
+    const context = useContext(MultisigContext);
 
     // Get the minimum votes parameter from the storage
     const minimumVotes = parseInt(context.storage?.minimum_votes);
@@ -252,7 +252,7 @@ function ProposalDescriptionContent(props) {
     if (kind.hasOwnProperty('add_user')) {
         return (
             <span>
-                add <TezosAddressLink address={proposal.user}  shorten /> to the multisign.
+                add <TezosAddressLink address={proposal.user}  shorten /> to the multisig.
             </span>
         );
     }
@@ -260,7 +260,7 @@ function ProposalDescriptionContent(props) {
     if (kind.hasOwnProperty('remove_user')) {
         return (
             <span>
-                remove <TezosAddressLink address={proposal.user} useAlias shorten /> from the multisign.
+                remove <TezosAddressLink address={proposal.user} useAlias shorten /> from the multisig.
             </span>
         );
     }

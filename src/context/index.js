@@ -10,22 +10,22 @@ import { stringToHex, hexToString } from '../utils';
 import { InformationMessage, ConfirmationMessage, ErrorMessage } from '../messages';
 
 
-// Load the multisign smart contrac code and metadata in JSON format
+// Load the multisig smart contrac code and metadata in JSON format
 const multisigContractCode = require('../contract/multisigContract.json');
 const multisigContractMetadata = require('../contract/multisigMetadata.json');
 
-// Define the default network and multisign contract address
+// Define the default network and multisig contract address
 const defaultNetwork = 'mainnet';
 const defaultContractAddress = 'KT1PKBTVmdxfgkFvSeNUQacYiEFsPBw16B4P';
 
-// Clear the multisign local storage if the stored network does not coincide with the default
-if (window.localStorage.multisignNetwork !== defaultNetwork) {
-    window.localStorage.removeItem('multisignNetwork');
-    window.localStorage.removeItem('multisignContractAddress');
+// Clear the multisig local storage if the stored network does not coincide with the default
+if (window.localStorage.multisigNetwork !== defaultNetwork) {
+    window.localStorage.removeItem('multisigNetwork');
+    window.localStorage.removeItem('multisigContractAddress');
 }
 
 // Set the connection parameters
-const network = window.localStorage.multisignNetwork || defaultNetwork;
+const network = window.localStorage.multisigNetwork || defaultNetwork;
 const rpcNode = `https://${network}.api.tez.ie`;
 
 // Initialize the tezos toolkit
@@ -33,7 +33,7 @@ const tezos = new TezosToolkit(rpcNode);
 
 // Initialize the wallet
 const wallet = new BeaconWallet({
-    name: 'multisign',
+    name: 'multisig',
     preferredNetwork: network
 });
 
@@ -43,26 +43,26 @@ tezos.setWalletProvider(wallet);
 // Create an instance of the IPFS client
 const ipfsClient = create('https://ipfs.infura.io:5001/api/v0');
 
-// Create the multisign context
-export const MultisignContext = createContext();
+// Create the multisig context
+export const MultisigContext = createContext();
 
-// Create the multisign context provider component
-export class MultisignContextProvider extends React.Component {
+// Create the multisig context provider component
+export class MultisigContextProvider extends React.Component {
 
     constructor(props) {
         // Pass the properties to the base class
         super(props);
 
-        // Sets the multisign contract addresses that are similar to the default contract
+        // Sets the multisig contract addresses that are similar to the default contract
         this.setContractAddresses = async () => {
-            // Send a query to tzkt to get all the multisign contract addresses
-            console.log('Querying tzKt to get the multisign contract addresses...');
+            // Send a query to tzkt to get all the multisig contract addresses
+            console.log('Querying tzKt to get the multisig contract addresses...');
             const response = await axios.get(`https://api.${this.state.network}.tzkt.io/v1/contracts/${this.state.contractAddress}/same`, {
                     params: {
                         select: 'address',
                     }
                 })
-                .catch((error) => console.log('Error while querying the multisign contract addresses:', error));
+                .catch((error) => console.log('Error while querying the multisig contract addresses:', error));
 
             // Update the component state
             this.setState({
@@ -83,10 +83,10 @@ export class MultisignContextProvider extends React.Component {
             });
         };
 
-        // Sets the multisign contract balance
+        // Sets the multisig contract balance
         this.setBalance = async () => {
             // Send a query to tzkt to get the contract balance
-            console.log('Querying tzKt to get the multisign contract balance...');
+            console.log('Querying tzKt to get the multisig contract balance...');
             const response = await axios.get(`https://api.${this.state.network}.tzkt.io/v1/accounts/${this.state.contractAddress}/balance`)
                 .catch((error) => console.log('Error while querying the contract balance:', error));
 
@@ -96,10 +96,10 @@ export class MultisignContextProvider extends React.Component {
             });
         };
 
-        // Sets the multisign contract storage
+        // Sets the multisig contract storage
         this.setStorage = async () => {
             // Send a query to tzkt to get the contract storage
-            console.log('Querying tzKt to get the multisign contract storage...');
+            console.log('Querying tzKt to get the multisig contract storage...');
             const response = await axios.get(`https://api.${this.state.network}.tzkt.io/v1/contracts/${this.state.contractAddress}/storage`)
                 .catch((error) => console.log('Error while querying the contract storage:', error));
 
@@ -109,7 +109,7 @@ export class MultisignContextProvider extends React.Component {
             });
         };
 
-        // Sets the multisign user aliases
+        // Sets the multisig user aliases
         this.setUserAliases = async () => {
             // Check if the contract storage is defined
             if (this.state.storage) {
@@ -149,12 +149,12 @@ export class MultisignContextProvider extends React.Component {
             }
         };
 
-        // Sets the multisign proposals
+        // Sets the multisig proposals
         this.setProposals = async () => {
              // Check if the contract storage is defined
             if (this.state.storage) {
                 // Send a query to tzkt to get all the proposals bigmap keys
-                console.log('Querying tzKt to get the multisign proposals...');
+                console.log('Querying tzKt to get the multisig proposals...');
                 const response = await axios.get(`https://api.${this.state.network}.tzkt.io/v1/bigmaps/${this.state.storage.proposals}/keys`, {
                         params: {
                             limit: 10000,
@@ -208,10 +208,10 @@ export class MultisignContextProvider extends React.Component {
             }
         };
 
-        // Sets the multisign contract reference
+        // Sets the multisig contract reference
         this.setContract = async () => {
-            // Get the multisign contract reference
-            console.log('Accessing the multisign contract...');
+            // Get the multisig contract reference
+            console.log('Accessing the multisig contract...');
             const contract = await tezos.wallet.at(this.state.contractAddress)
                 .catch((error) => console.log('Error while accessing the contract:', error));
 
@@ -231,9 +231,9 @@ export class MultisignContextProvider extends React.Component {
             errorMessage: message
         });
 
-        // Checks if the multisign contract reference is available
+        // Checks if the multisig contract reference is available
         this.contractIsAvailable = async () => {
-            // Try to set the multisign contract reference if it's undefined
+            // Try to set the multisig contract reference if it's undefined
             if (this.state.contract === undefined) await this.setContract();
 
             return this.state.contract !== undefined;
@@ -262,31 +262,31 @@ export class MultisignContextProvider extends React.Component {
             // The tezos network
             network: network,
 
-            // The multisign contract address
-            contractAddress: window.localStorage.multisignContractAddress || defaultContractAddress,
+            // The multisig contract address
+            contractAddress: window.localStorage.multisigContractAddress || defaultContractAddress,
 
-            // The list with all the available multisign contracts addresses
+            // The list with all the available multisig contracts addresses
             contractAddresses: undefined,
 
             // The current active account
             activeAccount: undefined,
 
-            // The multisign contract balance in mutez
+            // The multisig contract balance in mutez
             balance: undefined,
 
-            // The multisign contract storage
+            // The multisig contract storage
             storage: undefined,
 
-            // The multisign user aliases
+            // The multisig user aliases
             userAliases: undefined,
 
-            // The multisign proposals
+            // The multisig proposals
             proposals: undefined,
 
             // The user votes
             userVotes: undefined,
 
-            // The multisign contract reference
+            // The multisig contract reference
             contract: undefined,
 
             // The information message
@@ -298,7 +298,7 @@ export class MultisignContextProvider extends React.Component {
             // The error message
             errorMessage: undefined,
 
-            // Sets the multisign contract address
+            // Sets the multisig contract address
             setContractAddress: async (address) => {
                 // Return if the contract address didn't change
                 if (address === this.state.contractAddress) return;
@@ -351,7 +351,7 @@ export class MultisignContextProvider extends React.Component {
 
             // Votes a proposal
             voteProposal: async (proposalId, approval) => {
-                // Return if the multisign contract reference is not available
+                // Return if the multisig contract reference is not available
                 if (!(await this.contractIsAvailable())) return;
 
                 // Send the vote proposal operation
@@ -369,7 +369,7 @@ export class MultisignContextProvider extends React.Component {
 
             // Executes a proposal
             executeProposal: async (proposalId) => {
-                // Return if the multisign contract reference is not available
+                // Return if the multisig contract reference is not available
                 if (!(await this.contractIsAvailable())) return;
 
                 // Send the execute proposal operation
@@ -389,7 +389,7 @@ export class MultisignContextProvider extends React.Component {
 
             // Creates a transfer mutez proposal
             createTransferMutezProposal: async (transfers) => {
-                // Return if the multisign contract reference is not available
+                // Return if the multisig contract reference is not available
                 if (!(await this.contractIsAvailable())) return;
 
                 // Loop over the transfers information
@@ -427,7 +427,7 @@ export class MultisignContextProvider extends React.Component {
 
             // Creates a transfer token proposal
             createTransferTokenProposal: async (tokenContract, tokenId, transfers) => {
-                // Return if the multisign contract reference is not available
+                // Return if the multisig contract reference is not available
                 if (!(await this.contractIsAvailable())) return;
 
                 // Check that the token contract address is a valid address
@@ -461,7 +461,7 @@ export class MultisignContextProvider extends React.Component {
 
             // Creates an add user proposal
             createAddUserProposal: async (userAddress) => {
-                // Return if the multisign contract reference is not available
+                // Return if the multisig contract reference is not available
                 if (!(await this.contractIsAvailable())) return;
 
                 // Check that the user address is a valid address
@@ -470,9 +470,9 @@ export class MultisignContextProvider extends React.Component {
                     return;
                 }
 
-                // Check that the user address is not in the multisign users
+                // Check that the user address is not in the multisig users
                 if (this.state.storage?.users.includes(userAddress)) {
-                    this.setErrorMessage('The provided address is already a multisign user');
+                    this.setErrorMessage('The provided address is already a multisig user');
                     return;
                 }
 
@@ -490,7 +490,7 @@ export class MultisignContextProvider extends React.Component {
 
             // Creates a remove user proposal
             createRemoveUserProposal: async (userAddress) => {
-                // Return if the multisign contract reference is not available
+                // Return if the multisig contract reference is not available
                 if (!(await this.contractIsAvailable())) return;
 
                 // Check that the user address is a valid address
@@ -499,9 +499,9 @@ export class MultisignContextProvider extends React.Component {
                     return;
                 }
 
-                // Check that the user address is in the multisign users
+                // Check that the user address is in the multisig users
                 if (!this.state.storage?.users.includes(userAddress)) {
-                    this.setErrorMessage('The provided address is not a multisign user');
+                    this.setErrorMessage('The provided address is not a multisig user');
                     return;
                 }
 
@@ -519,12 +519,12 @@ export class MultisignContextProvider extends React.Component {
 
             // Creates a minimum votes proposal
             createMinimumVotesProposal: async (minimumVotes) => {
-                // Return if the multisign contract reference is not available
+                // Return if the multisig contract reference is not available
                 if (!(await this.contractIsAvailable())) return;
 
                 // Check that the minimum votes are within the expected range
                 if (minimumVotes <= 0 || minimumVotes > this.state.storage?.users.length) {
-                    this.setErrorMessage('The minimum votes need to be higher than 0 and less or equal to the number of multisign users');
+                    this.setErrorMessage('The minimum votes need to be higher than 0 and less or equal to the number of multisig users');
                     return;
                 }
 
@@ -542,7 +542,7 @@ export class MultisignContextProvider extends React.Component {
 
             // Creates an expiration time proposal
             createExpirationTimeProposal: async (expirationTime) => {
-                // Return if the multisign contract reference is not available
+                // Return if the multisig contract reference is not available
                 if (!(await this.contractIsAvailable())) return;
 
                 // Check that the expiration time is higher than 1 day
@@ -565,7 +565,7 @@ export class MultisignContextProvider extends React.Component {
 
             // Creates a lambda function proposal
             createLambdaFunctionProposal: async (michelineCode) => {
-                // Return if the multisign contract reference is not available
+                // Return if the multisig contract reference is not available
                 if (!(await this.contractIsAvailable())) return;
 
                 // Try to get the lambda function from the Micheline code
@@ -593,7 +593,7 @@ export class MultisignContextProvider extends React.Component {
 
             // Creates a text proposal
             createTextProposal: async (ipfsPath) => {
-                // Return if the multisign contract reference is not available
+                // Return if the multisig contract reference is not available
                 if (!(await this.contractIsAvailable())) return;
 
                 // Check that the IPFS path is not undefined
@@ -614,7 +614,7 @@ export class MultisignContextProvider extends React.Component {
                 await this.setProposals();
             },
 
-            // Originates a new multisign smart contract
+            // Originates a new multisig smart contract
             originate: async (parameters) => {
                 const { name, users, minimumVotes, expirationTime } = parameters;
 
@@ -629,7 +629,7 @@ export class MultisignContextProvider extends React.Component {
 
                 // Check that the minimum votes are within the expected range
                 if (minimumVotes <= 0 || minimumVotes > users.length) {
-                    this.setErrorMessage('The minimum votes need to be higher than 0 and less or equal to the number of multisign users');
+                    this.setErrorMessage('The minimum votes need to be higher than 0 and less or equal to the number of multisig users');
                     return;
                 }
 
@@ -661,8 +661,8 @@ export class MultisignContextProvider extends React.Component {
                     votes: new MichelsonMap()
                 };
 
-                // Send the operation that will orininate the new multisign contract
-                console.log('Sending the new multisign origination operation...');
+                // Send the operation that will orininate the new multisig contract
+                console.log('Sending the new multisig origination operation...');
                 const operation = await tezos.wallet.originate({code: multisigContractCode, storage: storage}).send()
                     .catch((error) => console.log('Error while originating the contract:', error));
 
@@ -735,9 +735,9 @@ export class MultisignContextProvider extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        // Update all the multisign data if the contract address changed
+        // Update all the multisig data if the contract address changed
         if (prevState.contractAddress !== this.state.contractAddress) {
-            // Update all the multisign data
+            // Update all the multisig data
             this.setBalance()
                 .then(() => this.setStorage())
                 .then(() => this.setUserAliases())
@@ -745,14 +745,14 @@ export class MultisignContextProvider extends React.Component {
                 .then(() => this.setUserVotes());
 
             // Update the local storage
-            window.localStorage.multisignNetwork = this.state.network;
-            window.localStorage.multisignContractAddress = this.state.contractAddress;
+            window.localStorage.multisigNetwork = this.state.network;
+            window.localStorage.multisigContractAddress = this.state.contractAddress;
         }
     }
 
     render() {
         return (
-            <MultisignContext.Provider value={this.state}>
+            <MultisigContext.Provider value={this.state}>
                 {this.state.informationMessage &&
                     <InformationMessage message={this.state.informationMessage} />
                 }
@@ -766,7 +766,7 @@ export class MultisignContextProvider extends React.Component {
                 }
 
                 {this.props.children}
-            </MultisignContext.Provider>
+            </MultisigContext.Provider>
         );
     }
 }

@@ -1,39 +1,39 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import { MultisignContextProvider } from './context';
+import { MultisigContextProvider } from './context';
 import { Header } from './header';
 import { Footer } from './footer';
-import { ContractSelectionForm, CreateProposalForms, OriginateMultisignForm } from './forms';
+import { ContractSelectionForm, CreateProposalForms, OriginateMultisigForm } from './forms';
 import { Parameters } from './parameters';
 import { Proposals } from './proposals';
 
 
 export function App() {
     return (
-        <MultisignContextProvider>
+        <MultisigContextProvider>
             <div className='app-container'>
                 <Header />
                 <Outlet />
                 <Footer />
             </div>
-        </MultisignContextProvider>
+        </MultisigContextProvider>
     );
 }
 
-export function MultisignParameters() {
+export function MultisigParameters() {
     return (
         <main>
-            <h1>Tezos multisign / mini-DAO</h1>
+            <h1>Tezos multisig / mini-DAO</h1>
             <ContractSelectionForm />
             <Parameters />
         </main>
     );
 }
 
-export function MultisignProposals() {
+export function MultisigProposals() {
     return (
         <main>
-            <h1>Multisign proposals</h1>
+            <h1>Multisig proposals</h1>
             <Proposals />
         </main>
     );
@@ -48,11 +48,11 @@ export function CreateProposals() {
     );
 }
 
-export function OriginateMultisign() {
+export function OriginateMultisig() {
     return (
         <main>
-            <h1>Create a new multisign</h1>
-            <OriginateMultisignForm />
+            <h1>Create a new multisig</h1>
+            <OriginateMultisigForm />
         </main>
     );
 }

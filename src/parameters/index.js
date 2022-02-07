@@ -1,17 +1,17 @@
 import React, { useContext } from 'react';
-import { MultisignContext } from '../context';
+import { MultisigContext } from '../context';
 import { TezosAddressLink } from '../link';
 
 
 export function Parameters() {
-    // Get the multisign context
-    const context = useContext(MultisignContext);
+    // Get the multisig context
+    const context = useContext(MultisigContext);
 
     return (
         <section>
             <h2>Main parameters</h2>
             <ul className='parameters-list'>
-                <li>Multisign users:
+                <li>Multisig users:
                     <ul className='users-list'>
                         {context.storage?.users.map((user, index) => (
                             <li key={index}>

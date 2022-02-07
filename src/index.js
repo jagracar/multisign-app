@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter, Routes, Route} from 'react-router-dom';
-import { App, MultisignParameters, MultisignProposals, CreateProposals, OriginateMultisign, NotFound } from './App';
+import { App, MultisigParameters, MultisigProposals, CreateProposals, OriginateMultisig, NotFound } from './App';
 import reportWebVitals from './reportWebVitals';
 import './styles/index.scss';
 
@@ -11,10 +11,10 @@ ReactDOM.render(
         <BrowserRouter>
             <Routes>
                 <Route path='/' element={<App />}>
-                    <Route index element={<MultisignParameters />} />
-                    <Route path='proposals' element={<MultisignProposals />} />
+                    <Route index element={<MultisigParameters />} />
+                    <Route path='proposals' element={<MultisigProposals />} />
                     <Route path='create' element={<CreateProposals />} />
-                    <Route path='originate' element={<OriginateMultisign />} />
+                    <Route path='originate' element={<OriginateMultisig />} />
                     <Route path='*' element={<NotFound />} />
                 </Route>
             </Routes>

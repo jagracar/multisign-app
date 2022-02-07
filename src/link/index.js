@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { MultisignContext } from '../context';
+import { MultisigContext } from '../context';
 import { tokens } from '../utils';
 
 
@@ -12,8 +12,8 @@ export function DefaultLink(props) {
 }
 
 export function TzktLink(props) {
-    // Get the multisign context
-    const context = useContext(MultisignContext);
+    // Get the multisig context
+    const context = useContext(MultisigContext);
 
     return (
         <DefaultLink href={`https://${context.network}.tzkt.io/${props.address}`} className={props.className? props.className : ''}>
@@ -23,8 +23,8 @@ export function TzktLink(props) {
 }
 
 export function TezosAddressLink(props) {
-    // Get the multisign context
-    const context = useContext(MultisignContext);
+    // Get the multisig context
+    const context = useContext(MultisigContext);
 
     // Get the user alias
     const alias = context.userAliases && context.userAliases[props.address];
