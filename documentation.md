@@ -1,21 +1,23 @@
 # Documentation
 
-
 ## Background
 
-As soon as the the Teia community was formed, just one day after the hic et nunc main site
-discontinuation, it became clear that decisions would need to be taken in a distributed manner
-and that a single person should not have the power to shut down a site, modify the internal
-parameters of a critical smart contract or administer the platform fees.
+The [Teia Community](https://twitter.com/TeiaCommunity) (at that time called the HEN Community) was
+spontaneously formed the 12th of November 2021, just few hours after the [hic et nunc](https://hicetnunc.xyz) 
+marketplace discontinuation. At that exact moment, it became clear that community decisions would
+need to be taken in a distributed manner and that a single person should never again have the power to
+shut down a site, modify the internal parameters of a critical smart contract or administer the platform fees.
 
-Using a multisig was proposed as a quick solution to manage the future Teia marketplace fees 
-before a community DAO was created. A multisig is a smart contract that requires several signatures in 
-order to execute transactions.
+Using a multisig wallet was proposed as a quick solution to manage the future [Teia marketplace](https://teia.art),
+before a community [DAO](https://en.wikipedia.org/wiki/The_DAO_(organization)) was formed.
+A [multisig wallet](https://tezos.gitlab.io/user/multisig.html#multi-signature-smart-contracts) is a smart contract 
+that requires several signatures in order to execute transactions.
 
-After some investigations, it was found that existing tezos solutions were not easy to use for
-the average artists / collector. This lead to the decision of creating a basic multisig smart
-contract that would be easy to use and could incorporate some special features needed by the
-Teia community.
+After some investigation, it was found that
+[existing tezos solutions](https://tezos.gitlab.io/user/multisig.html#supported-versions-of-the-multisig-contract)
+were mostly designed for people with good programming skills. This lead to the decision of developing a
+basic multisig smart contract that would be easy to use and would incorporate some special features needed by the
+Teia Community.
 
 These were the main requirements for the Teia multisig:
 
@@ -23,56 +25,60 @@ These were the main requirements for the Teia multisig:
  - It should be possible to add and remove users to allow responsibility rotation.
  - It should be possible to modify the required quorum to execute transactions.
  - In addition to tez transactions, the multisig should be able to call other smart contracts.
-   In particular, it should be able to administer the Teia marketplace contract (update the fees,
-   include new tokens to trade on the site, pause the swaps and collects).
- - User actions should be registered for future evaluation and archival purposes.
+   In particular, it should be able to administer the
+   [Teia marketplace contract](https://github.com/teia-community/objkt-swap/blob/3.0.0/smart-py/marketplace.py)
+   (update the fees, include new tokens to trade on the site, pause swaps and collects, and more).
+ - User actions (votes) should be registered for future evaluation and archival purposes.
 
-Based on these requirements, a group of members of the Teia community started to develop a new
-multisig smart contract in the last days of November 2021. Few days later a prototype was deployed
-to the tezos testnet and it was tested by several community members. 
+Based on these requirements, a small group of Teia Community members started to develop a multisig 
+smart contract in the last days of November 2021. Few days later a prototype was deployed
+to the tezos testnet, which was tested by voluntaries with different skills and backgrounds. 
 
-After many iterations, on Decemeber 20th 2021, a final version of the multisig smart contract
-code and unit tests was sent to inference_ag to perform an security audit of the code.
+On Decemeber 20th 2021, after many iterations, a final version of the Teia multisig smart contract
+code and unit tests was sent to the [Inference](https://inference.ag) team to perform an independed
+security audit.
 
 The audit didn't find any major security issues, but suggested documentation improvements
-and some code changes to save in user transaction costs. Changes were implemented and the final
-version of the Teia multisig was deployed to the tezos mainnet on the 31st of January 2022.
+and some small code changes to save in user transaction costs. The suggested changes were implemented
+and the [final version](https://github.com/jagracar/tezos-smart-contracts/blob/main/python/contracts/multisignWalletContract.py)
+of the Teia multisig was deployed to the tezos mainnet the 31st of January 2022.
 
-At the same time that the audit was done, a basic web interface was developed to simplify the
-use of the multisig. After syncing their wallet, a user of the multisig could create proposals
-to be voted by other multisig users, can vote other user proposals, and can execute any proposal
-that has reached the required number of positive votes to be approved.
+Parallel to the audit, a basic [web interface](https://github.com/jagracar/multisign-app) was developed
+to simplify the use of the multisig. After syncing their wallet, a user of the multisig can create
+proposals to be voted by other multisig users, can vote other user-submitted proposals, and can execute
+any proposal that has reached the required number of positive votes to be approved.
 
 
 ## General use case
 
-As described before, the initial purpose of the Teia multisig contract was to facility the
-managing of the Teia marketplace contract and fees. However, the multisig is general enough
-to be used in many other situations:
+As described before, the initial purpose of the Teia multisig was to facility the managing of the 
+Teia marketplace smart contracts and fees. However, the multisig is general enough to be used in many
+other situations:
 
- - A NGO could create a multisig to administer third party donations in a safe way.
- - A group of collectors could create a multisig to buy and sell NFTs.
- - A group of friends could use a multisig to decide their next holiday destination.
+ - A [NGO](https://en.wikipedia.org/wiki/Non-governmental_organization) could use a multisig to administer
+   third party donations in a safe way.
+ - A group of collectors could create a multisig to buy and sell [NFTs](https://en.wikipedia.org/wiki/Non-fungible_token).
+ - A group of friends could use a multisig to vote their next holiday destination.
 
 Before creating (originating) a multisig, one needs to decide the following:
 
- - How many users will be part of the multisig? A user is identified by their tz wallet.
+ - How many users will be part of the multisig. A user is identified by their tezos wallet.
    In principle, there is no upper limit in the number of users the multisig can have, but the
-   smart contract code is not designed to work with several thousand of users. Less than 50
+   smart contract code is not designed to work with several thousand users. Less than 50
    users is recommended.
  - How many positive votes are required to approve proposals. This number should be higher
-   than 1, but not higher than the number of users. The higher the number, the more difficult
-   will be to approve a proposal.
+   than 1, but not higher than the total number of users. The higher the number, the more difficult
+   will be to approve proposals.
  - The proposal expiration time expressed in days after the proposal creation. If the time is 
    too short, proposals might not get approved, because some users might not have enough time
    to vote for them.
 
 ## Multisig web interface
 
-Once the multisig is deployed to the mainnet, users can interact with it using the web interface.
+Once the multisig is deployed to the mainnet, users can interact with it using a web interface.
 The first step is to sync their wallets, to prove that they are a member of the multisig.
 
-The starting page displays the main multisig parameters: 
+The landing page displays the main multisig parameters:
 
  - the list of multisig users
  - the multisig contract address
