@@ -143,37 +143,39 @@ proposal id should be used in the discussion to keep the connection with the vot
 ### Creating proposals
 
 Multisig users can create new proposals at any time. To do it, they need to go to the create proposals
-tab. This page contains a list of forms that can be used to submit new proposals.
+tab. This page contains multiple forms that can be used to submit new proposals.
 
 ![multisig create proposals tab](documentation_figures/ms-create-proposals.png)
 
-These are the different proposals that the multisig supports:
+The multisig supports the following types of proposals:
 
-- Transfer tez proposal. Use this proposal to transfer tez from the multisig to list of addresses.
+- Transfer tez proposal. Use this proposal to transfer tez from the multisig to a list of addresses.
   Each address can receive a different tez amount. Of course, the total tez amount should be smaller
-  than the number of tez in the multisig at the time of execution.
+  than the number of tez available in the multisig at the time of execution.
 
-- Transfer token proposal. With this proposal one can transfer editions of FA2 token owned by the multisig
-  to a list of addresses. Each address can receive a different number of token editions.
+- Transfer token proposal. With this proposal one can transfer to a list of addresses several editions of a
+  [FA2](https://gitlab.com/tezos/tzip/-/blob/master/proposals/tzip-12/tzip-12.md) token owned by the multisig.
+  Each address can receive a different number of editions.
 
 - Text proposals. This proposal is used to approve a text that has no direct consequence on the
   multisig or any other smart contract. They are used to register the users support to a given proposal
-  written in plain text and stored in IPFS. For example, a text proposal could ask to change some
-  component on a website UI, decide on a dog name, or suggest that one multisig user buys bread at the
-  bakery.
+  written in plain text and stored in [IPFS](https://en.wikipedia.org/wiki/InterPlanetary_File_System).
+  For example, a text proposal could ask to change some component on a website UI, decide on a dog name, 
+  or suggest that one multisig user buys bread at the bakery.
 
-- Lambda function proposal. This is the most powerful of all proposals and at the same time the most
-  complex and the one that requires more close inspection. The proposal consists on some Michelson code
-  that will be executed once the proposal is approved. This proposal could be used to collect or swap NFTs,
-  to update other contract parameters, to delegate the multisig tez to a baker or to vote in a DAO of
-  which the multisig is a member. Since the proposal consist of pure Michelson code, it's important that users
-  understand what the code is doing before voting YES to it.
+- Lambda function proposal. This is the most powerful of all the multisig proposals, and at the same time
+  the most complex and the one that requires a closer inspection. They contain some 
+  [Michelson](https://tezos.gitlab.io/active/michelson.html) code that will be executed if the proposal
+  is approved. These kind of proposals could be used, for example, to collect NFTs, to update other
+  smart contract parameters, to delegate the multisig tez to a baker, or to vote in a DAO in which the multisig
+  is a member. Since the proposal consist of pure Michelson code, it's very important that users understand what
+  the code is doing before they vote `YES` to it.
 
 - Add user proposal. One can use this proposal to add new users to the multisig.
 
 - Remove user proposal. Same as the add user proposal, but to remove an existing user from the multisig.
 
-- Minimum votes proposal. With this proposal one can increase or decrease the minimum of positive votes
+- Minimum votes proposal. With this proposal one can increase or decrease the minimum number of positive votes
   required to execute a proposal.
   
 - Expiration time proposal. Use this proposal to change the proposals expiration time.
@@ -181,33 +183,36 @@ These are the different proposals that the multisig supports:
 
 ## Important considerations
 
-- Choose well the number of users and the minimum votes to approve proposals. Imagine a multisig with only
-  2 users where only one positive vote is needed to execute proposals. In that situation, one of the users
-  could create a proposal to transfer all the tez to an account controlled by the user. On the other side,
-  a multisig with two users an a minimum of 2 positive votes to execute proposals could get blocked if
-  one of the users disappears or losses their wallet keys. In that case, it would be impossible to execute
-  proposals and any tez or tokens in the multisig will become inaccessible.
-  
-  These kind of situations could be minimized adding more users to the multisig. A multisig with 9 users
-  and a minimum of 5 positive votes to approve proposals, would make more difficult that a small group
-  of users impose their proposals to the rest. At the same time, 4 user would need to loose their keys
-  to block the multisig forever.
-  
-  Ideally inactive multisig users should be identified and removed from the multisig to avoid the problem
-  of not being able to approve proposals.
-  
-- Any update in the multisig parameters will affect all active and expired proposals. One should always
-  evaluate the unexpected consequences that changing the parameter could have on them.
+### Choose well the total number of multisig users and the minimum number of positive votes to approve proposals
 
-  For example, reducing the expiration time from 5 to 2 days could set some active proposals as expired.
-  Increasing it from 5 to 10 days could reactivate some expired proposals.
-  
-  Removing a user might make a multisig inoperable if the minimum number of positive votes is not reduced
-  at the same time and there are a significant fraction of inactive users in the multisig. For example,
-  a multisig with 4 users and 3 minimum positive votes to approve proposal, will become a 3 users multisig
-  if one of the users is removed and will require that all vote yes to approve future proposals. If one
-  of the users is not active, the multisig will be blocked.
-  
-  Increasing the number of positive votes to approve proposals could also block a multisig if many users
-  are not active or loose their keys.
+Imagine a multisig with 2 users where only one positive vote is needed to execute proposals.
+In that situation, one of the users could create a proposal to transfer all the tez to their own account
+and the other user would not be able to stop it.
 
+On the other hand, a multisig with two users an a minimum of 2 positive votes to execute proposals could
+get blocked if one of the users disappears or losses access to their wallet. In that case, it would be
+impossible to approve new proposals and any tez or tokens in the multisig will be lost.
+  
+These kind of situations could be minimized adding more users to the multisig. A multisig with 9 users
+and a minimum of 5 positive votes to approve proposals, would make more difficult that a small group
+of users impose their proposals to the majority. At the same time, 5 users would need to loose their keys
+in order to block the multisig forever.
+
+Inactive users should be identified and removed from the multisig to avoid the possibilities of not being
+able to approve proposals.
+
+### Any update in the multisig parameters will affect all active and expired proposals
+
+One should always evaluate the unexpected consequences of changing one of the multisig parameters.
+
+For example, reducing the expiration time from 5 to 2 days could set some active proposals as expired.
+Increasing it from 5 to 10 days could reactivate some expired proposals.
+
+Removing a user might make a multisig inoperable if the minimum number of positive votes is not reduced
+at the same time, and there is a significant fraction of inactive users in the multisig. For example,
+a multisig with 4 users and a minimum of 3 positive votes to approve proposals, will become a 3-user multisig
+if one of the users is removed and will require that all vote `YES` to approve future proposals. If one
+of the users is not active, the multisig will be blocked.
+
+Increasing the number of positive votes to approve proposals could also block a multisig if many users
+are not active or loose their keys.
