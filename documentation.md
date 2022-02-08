@@ -1,4 +1,4 @@
-# Documentation
+# Multisig documentation
 
 ## Background
 
@@ -28,7 +28,7 @@ These were the main requirements for the Teia multisig:
    In particular, it should be able to administer the
    [Teia marketplace contract](https://github.com/teia-community/objkt-swap/blob/3.0.0/smart-py/marketplace.py)
    (update the fees, include new tokens to trade on the site, pause swaps and collects, and more).
- - User actions (votes) should be registered for future evaluation and archival purposes.
+ - User actions (votes) should be stored in the contract for future evaluation and archival purposes.
 
 Based on these requirements, a small group of Teia Community members started to develop a multisig 
 smart contract in the last days of November 2021. Few days later a prototype was deployed
@@ -38,7 +38,8 @@ On Decemeber 20th 2021, after many iterations, a final version of the Teia multi
 code and unit tests was sent to the [Inference](https://inference.ag) team to perform an independed
 security audit.
 
-The audit didn't find any major security issues, but suggested documentation improvements
+The [audit](https://github.com/InferenceAG/ReportPublications/blob/master/Inference%20AG%20-%20Teia%20community%20-%20marketplace%20%26%20multisig%20-%20v1.0.pdf)
+didn't find any major security issues, but suggested documentation improvements
 and some small code changes to save in user transaction costs. The suggested changes were implemented
 and the [final version](https://github.com/jagracar/tezos-smart-contracts/blob/main/python/contracts/multisignWalletContract.py)
 of the Teia multisig was deployed to the tezos mainnet the 31st of January 2022.
@@ -60,77 +61,91 @@ other situations:
  - A group of collectors could create a multisig to buy and sell [NFTs](https://en.wikipedia.org/wiki/Non-fungible_token).
  - A group of friends could use a multisig to vote their next holiday destination.
 
-Before creating (originating) a multisig, one needs to decide the following:
+With the hope that it would be useful not only for the Teia Community artists and collectors, but also to the
+tezos community as a whole, Teia has open sourced the code of the multisig smart contract and associated web
+interface. Everybody is now free to create their own multisig wallet and to adapt it to their particular
+needs.
+
+Before creating (originating) a multisig, one has to decide the following:
 
  - How many users will be part of the multisig. A user is identified by their tezos wallet.
    In principle, there is no upper limit in the number of users the multisig can have, but the
    smart contract code is not designed to work with several thousand users. Less than 50
    users is recommended.
  - How many positive votes are required to approve proposals. This number should be higher
-   than 1, but not higher than the total number of users. The higher the number, the more difficult
-   will be to approve proposals.
+   than 1 and cannot exceed the total number of users in the multisig. The higher the number,
+   the more difficult will be to approve proposals.
  - The proposal expiration time expressed in days after the proposal creation. If the time is 
    too short, proposals might not get approved, because some users might not have enough time
    to vote for them.
 
-## Multisig web interface
+## Web interface
 
-Once the multisig is deployed to the mainnet, users can interact with it using a web interface.
-The first step is to sync their wallets, to prove that they are a member of the multisig.
+Once the multisig is deployed to the mainnet, users can interact with it using a [web interface](https://multisign.onrender.com/).
 
-The landing page displays the main multisig parameters:
+### Home page
 
- - the list of multisig users
- - the multisig contract address
- - the minimum number of positive votes required to execute proposals
- - the proposals expiration time
- - the current multisig tez balance
+At the home page one needs to select the correct multisig for a list of available options. After
+loading it, the main multisig parameters are shown:
 
-Any wallet can transfer tez to the multisig. It is not necessary that the wallet is a multisig
-user. This allows third party donations and tez transfers from other contracts (e.g. fee transfers
-from the Teia marketplace contract).
+ - The list of multisig users. If the user is a member of the multisig and they have synced their wallet,
+   they should see their name highlighted with a green background.
+ - The multisig contract address. Clicking on it will open a tab to the [TzKt](https://tzkt.io/) contract information.
+ - The minimum number of positive votes required to execute proposals.
+ - The proposals expiration time.
+ - The current multisig tez balance.
 
-One can use the any tezos wallet (Temple, Kukai) to transfer tez or NFTs to the multisig.
-Just use the multisig contract address as the receiver address.
+![multisig home page](documentation_figures/ms-home.png)
 
-Clicking on the proposals tab we can access the information of all current and past proposals.
-They are distributed in tree groups: active, executed and expired proposals.
+Any person can transfer tez to the multisig. They don't need to be a multisig user.
+This allows third party donations and tez transfers from other contracts (e.g. the management
+fee transfers sent by the Teia marketplace contract).
 
-Active proposals are those that have not yet being executed and their expiration time has not yet
-passed. These are the only proposals that users of the multisig can interact with. Any user
-will see YES / NO buttons that they can click to vote. Close to those buttons
-there is a counter with the number of positive votes that the proposal has received so far. If the
-user has not voted yet the proposal, the background color will be white. If they already
-voted YES, the background color will be green, and if they voted NO it will be red. Users can
-change their vote at any moment by clicking again on the YES / NO buttons.
+It is possible to use the any tezos wallet ([Temple](https://templewallet.com/), [Kukai](https://wallet.kukai.app/))
+to transfer tez or NFTs to the multisig. Just use the multisig contract address as the receiver address.
 
-Note that only positive votes (YES votes) are counted to decide if a proposal can be executed or
-not. Negative votes have no effect, except to highlight the user disagreement with the proposal.
+### Proposals page
+
+Clicking on the proposals tab one can access the information of all the submitted proposals.
+They are distributed in three groups: active, executed and expired proposals.
+
+![multisig proposals tab](documentation_figures/ms-proposals.png)
+
+Active proposals are those proposals that have not yet being executed and their expiration time
+has not yet passed. These are the only proposals that users of the multisig can interact with.
+
+Active proposals have `YES` and `NO` buttons that can be clicked for voting. 
+Close to those buttons there is a counter with the number of positive votes that the proposal has
+received so far. If the user has not voted the proposal, the background color will be white. 
+If they voted `YES`, the background color will be green, and if they voted `NO` the background will be red.
+Users can change their vote at any moment by clicking again on the `YES` and `NO` buttons.
+
+Note that only positive votes (`YES` votes) are counted to decide if a proposal can be executed or
+not. Negative votes have no effect, except to highlight the user strong disagreement with the proposal.
 All votes are stored inside the smart contract and can always be inspected to see how controversial
 a proposal was.
 
-When an active proposal reaches the minimum number of positive votes, a new EXECUTE button appears.
+When an active proposal reaches the minimum number of positive votes, a new `execute` button appears.
 This button can be clicked by any multisig user and will result in the execution of the proposal.
 
-Once a proposal is executed, it cannot be voted or executed anymore. It leaves the active proposal
-list and becomes part of the executed proposal list. In that list one can see which proposals have
+Once a proposal is executed, it cannot be voted or executed anymore. It leaves the active proposals
+list and becomes part of the executed proposals list. In that list one can see which proposals have
 been executed and the number of positive votes that they received.
 
 Finally, the last proposal list shows those proposals that didn't reach the minimum number of votes
-to be executed before their expiration time. After the expiration time, these proposals cannot 
-be voted anymore. They are listed to see proposals that did not reach an agreement between the
-multisig users.
-
-Note that one can always resubmit an expired proposal and start the voting process again.
+to be executed before their expiration time passed. An expired proposal cannot be voted anymore. 
+However, it is always possible to resubmit an expired proposal and start the voting process again.
 
 Each proposal can be identified by an unique id number. Ideally, before the voting process starts, 
 proposals should be discussed between the multisig users via discord / twitter / email. The
 proposal id should be used in the discussion to keep the connection with the voting in the multisig.
 
-## Creating proposals
+### Creating proposals
 
-Multisig users can create new proposals at any time. To do it, they need to go to the create proposal
+Multisig users can create new proposals at any time. To do it, they need to go to the create proposals
 tab. This page contains a list of forms that can be used to submit new proposals.
+
+![multisig create proposals tab](documentation_figures/ms-create-proposals.png)
 
 These are the different proposals that the multisig supports:
 
