@@ -44,7 +44,7 @@ and some small code changes to save in user transaction costs. The suggested cha
 and the [final version](https://github.com/jagracar/tezos-smart-contracts/blob/main/python/contracts/multisignWalletContract.py)
 of the Teia multisig was deployed to the tezos mainnet the 31st of January 2022.
 
-Parallel to the audit, a basic [web interface](https://github.com/jagracar/multisign-app) was developed
+Parallel to the audit, a basic [web interface](https://github.com/teia-community/multisig-app) was developed
 to simplify the use of the multisig. After syncing their wallet, a user of the multisig can create
 proposals to be voted by other multisig users, can vote other user-submitted proposals, and can execute
 any proposal that has reached the required number of positive votes to be approved.
