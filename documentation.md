@@ -145,7 +145,7 @@ proposal id should be used in the discussion to keep the connection with the vot
 Multisig users can create new proposals at any time. To do it, they need to go to the create proposals
 tab. This page contains multiple forms that can be used to submit new proposals.
 
-![multisig create proposals tab](documentation_figures/ms-create-proposals.png)
+![create proposals tab](documentation_figures/ms-create-proposals.png)
 
 The multisig supports the following types of proposals:
 
@@ -179,6 +179,21 @@ The multisig supports the following types of proposals:
   required to execute a proposal.
   
 - Expiration time proposal. Use this proposal to change the proposals expiration time.
+
+
+### Creating a new multisig
+
+It is possible to configure and deploy and new multisig wallet using the web interface. To do it one has
+to click on the *New multisig* tab.
+
+After entering the multisig name, one can specify the list of users that will be part of the multisig,
+the minimum number of positive votes required to approve proposals, and the proposals expiration time.
+
+After that, one just need to click on the `originate` button and accept the transaction. The typical cost
+of deploying a new multisig wallet to the tezos mainnet is arount 2 tez. However, this depends on the total number
+of multisig users, since a large number could increase significantly the storage fees.
+
+![create new multisig tab](documentation_figures/ms-new-multisig.png)
 
 
 ## Important considerations
