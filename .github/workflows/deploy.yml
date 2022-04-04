@@ -1,0 +1,58 @@
+name: Deploy to gh-pages
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-deploy:
+    concurrency: ci-${{ github.ref }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [16.x]
+
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v3
+
+      - uses: pnpm/action-setup@v2.1.0
+        with:
+          version: 6.32.3
+
+      - name: 🔧 Installing Node ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: ${{ !env.ACT && 'npm' || '' }}
+          cache-dependency-path: package-lock.json
+
+      - name: 💾 Cache node modules
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-node-modules
+        with:
+          # npm cache files are stored in `~/.npm` on Linux/macOS
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - name: 🌏 Install Dependencies
+        run: npm install
+
+      - name: ⚙️ Build
+        run: npm build
+
+      - name: 🧹 Add nojekyll file
+        working-directory: build
+        run: |
+          touch .nojekyll
+
+      - name: 🚀 Deploy to Github Pages
+        uses: JamesIves/github-pages-deploy-action@v4.2.5
+        with:
+          branch: gh-pages # The branch the action should deploy to.
+          folder: build # The folder the action should deploy.
