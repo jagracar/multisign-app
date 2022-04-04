@@ -4,7 +4,7 @@ A basic react app to interact with my tezos [multisig smart contract](https://gi
 
 ## Installation
 
-This should work with Node.js v16.13.1:
+This should work with Node.js v16.14.2:
 
 ```bash
 cd multisign-app
